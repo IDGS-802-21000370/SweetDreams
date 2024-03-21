@@ -1,0 +1,90 @@
+{% extends 'layout2.html' %}
+    {%from "_macros.html" import input_Form%}
+{%block content%}
+<!-- Section: Design Block -->
+<style>
+.gradient-custom-2 {
+    background: #c29e85;
+
+    background: -webkit-linear-gradient(to right, #c29e85, #b98d6d, #9c663f, #8b4513);
+
+    background: linear-gradient(to right, #c29e85, #b98d6d, #9c663f, #8b4513);
+}
+
+</style>
+<div class="container mt-5">
+        <div class="container py-5 h-100">
+          <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-xl-10">
+              <div class="card rounded-3 text-black">
+                <div class="row g-0">
+                  <div class="col-lg-6">
+                    <div class="card-body p-md-5 mx-md-4">
+      
+                      <div class="text-center">
+                        <img src="img/logoSweetDreams.jpeg" style="width: 185px;" alt="logo">
+                        <h4 class="mt-1 mb-5 pb-1">Inicio de sesión</h4>
+                      </div>
+      
+                      <form>
+      
+                        <div class="form-outline mb-4">
+                            {{input_Form(formLogin.usuario, class="form-control")}}
+                        </div>
+      
+                        <div class="form-outline mb-4">
+                            {{input_Form(formLogin.contrasenia, class="form-control")}}
+                        </div>
+      
+                        <div class="text-center pt-1 mb-5 pb-1">
+                            <button type="submit" class="btn btn-primary btn-block fa-lg gradient-custom-2">Login</button>
+                          <!-- <a class="text-muted" href="#!">Forgot password?</a> -->
+                        </div>
+       
+                        <div class="d-flex align-items-center justify-content-center pb-4">
+                          <p class="mb-0 me-2">Registrate</p>
+                          <button type="button" class="btn btn-outline-danger">Create new</button>
+                        </div>
+      
+                      </form>
+      
+                    </div>
+                  </div>
+                  <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
+                    <div class="text-white px-3 py-4 p-md-5
+                     mx-md-4">
+                      <h4 class="mb-4">SWEET DREAMS</h4>
+                      <p>En Sweet Dreams, cada galleta es más que un simple postre, es una experiencia. Nuestro equipo de maestros pasteleros combina ingredientes frescos y cuidadosamente seleccionados para crear una variedad de sabores que deleitan los paladares más exigentes. Desde las clásicas galletas de chocolate con chispas hasta las innovadoras creaciones con ingredientes exóticos, cada una de nuestras recetas es única y está diseñada para satisfacer tus antojos más dulces.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+</div>
+
+<!-- 
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">Login</h3>
+                </div>
+                <div class="card-body">
+                    <form action="/login", method="POST">
+                        <div class="form-group">
+                            {{input_Form(formLogin.usuario, class="form-control")}}
+                        </div>
+                        <div class="form-group">
+                            {{input_Form(formLogin.contrasenia, class="form-control")}}
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+{%endblock%}
