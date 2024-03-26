@@ -1,4 +1,4 @@
-""" import os
+import os
 from sqlalchemy import create_engine
 
 class Config():
@@ -7,4 +7,4 @@ class Config():
 
 class DevelopmentConfig(Config):
     DEBUG=True
-    SQLALCHEMY_DATABASE_URI='mysql+pymysql://root:losverdes@localhost/SweetDreams' """
+    SQLALCHEMY_DATABASE_URI='mysql+pymysql://root:123456@localhost/sweetsdreams' 
