@@ -22,6 +22,7 @@ def login():
 def page_not_found(e):
     return render_template("404.html"),404
 
+
 if __name__ == "__main__":
     csrf.init_app(app)
     """ db.init_app(app)

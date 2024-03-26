@@ -7,3 +7,15 @@ class LoginForm(Form):
                          validators.Length(min=1, max=10, message="ingresa nombre valido")])
     contrasenia = StringField("Contraseña", [validators.DataRequired(message="el campo es requerido"), 
                          validators.Length(min=1, max=10, message="ingresa nombre valido")])
+    
+class UsuarioForm(Form):
+    nombre = StringField("Nombre", [validators.DataRequired(message="el campo es requerido"), 
+                         validators.Length(min=1, max=10, message="ingresa nombre valido")])
+    nombreUsuario = StringField("Nombre de usuario", [validators.DataRequired(message="el campo es requerido"), 
+                         validators.Length(min=1, max=10, message="ingresa usuario valido")])
+    contrasenia = StringField("Contraseña", [validators.DataRequired(message="el campo es requerido"), 
+                         validators.Length(min=1, max=10, message="ingresa contraseña valida")])
+    puesto = StringField("Puesto", [validators.DataRequired(message="el campo es requerido"), 
+                         validators.Length(min=1, max=10, message="ingresa puesto valido")])
+    rol = StringField("Rol", [validators.DataRequired(message="el campo es requerido"), 
+                         validators.Length(min=1, max=10, message="ingresa rol valido")])
