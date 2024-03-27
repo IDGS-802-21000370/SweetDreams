@@ -78,3 +78,13 @@
 .menu-open ~ .container {
   transform: translateX(10px);
 }
+
+/* ESTILOS DE INVENARIO */
+
+.tituloInventario {
+  color: #333;
+  font-style: italic;
+  font-weight: bold;
+}
+
+

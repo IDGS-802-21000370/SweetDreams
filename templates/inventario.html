@@ -1,0 +1,47 @@
+{% extends 'layoutPrincipal.html' %}
+{% from "_macros.html" import input_Form %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+            <h1 class="tituloInventario">Materia Prima</h1>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Caducidad</th>
+                    <th>Mandar a merma</th>
+                </tr>
+                {% for mp in materiasPrimas %}
+                <tr>
+                    <td>{{ mp['nombre'] }}</td>
+                    <td>{{ mp['cantidad'] }}</td>
+                    <td>{{ mp['caducidad'] }}</td>
+                    <td><input type="submit" id="mandarMerma" class="btn btn-danger" name="mandarMerma" value="{{ mp['id_materiasPrimas'] }}"/> </td>                        
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="col-6">
+            <h1 class="tituloInventario">Galletas</h1>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Caducidad</th>
+                    <th>Mandar a merma</th>
+                </tr>
+                {% for g in galletas %}
+                <tr>
+                    <td>{{ g['nombre'] }}</td>
+                    <td>{{ g['cantidad'] }}</td>
+                    <td>{{ g['caducidad'] }}</td>
+                    <td><input type="submit" id="mandarMerma" class="btn btn-danger" name="mandarMerma" value="{{ g['id'] }}"/> </td>                        
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

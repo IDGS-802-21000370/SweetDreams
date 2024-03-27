@@ -1,0 +1,63 @@
+{% extends 'layoutPrincipal.html' %}
+{% from "_macros.html" import input_Form %}
+{% block content %}
+<div class="container">
+    <form name="receta" action="/recetas" id="receta" method="POST">
+        <div class="row">
+        <div class="col">
+            {{input_Form(formReceta.nombreReceta, class="form-control")}} 
+        </div>
+        <div class="col">
+            
+        </div>
+        <div class="col">
+            {{input_Form(formReceta.cantidad, class="form-control")}}
+        </div>
+        <div class="col">
+            
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <label for="cars">Selecciona la materia prima: </label>
+            <select id="cars" name="cars">
+                <option value="volvo">Volvo</option>
+                <option value="saab">Saab</option>
+                <option value="fiat">Fiat</option>
+                <option value="audi">Audi</option>
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <input type="submit" id="registrar" class="btn btn-dark" name="registrar" value="Registrar"/>
+        </div>
+    </div>
+    <div class="col mt-3 mb-3">  
+        <table class="table table-bordered">
+            <tr>
+                <th>Ingredientes</th>
+                <th>Cantidad</th>
+                <th>Tipo de medida</th>
+                <th>Eliminar</th>
+            </tr>
+            {% for r in receta %}
+            <tr>
+                <td>{{ r['ingrediente'] }}</td>
+                <td>{{ r['cantidad'] }}</td>
+                <td>{{ r['tipoMedida'] }}</td>
+                <td><input type="submit" id="eliminar" class="btn btn-danger" name="eliminar" value="{{ r['id_catReceta'] }}"/> </td>                        
+            </tr>
+            {% endfor %}
+        </table>
+        <input type="button"  onclick="openModal()" class="btn btn-success" value="Realizar compra"/>
+    </div>
+    <div class="row">
+        {{input_Form(formReceta.descripcion, class="form-control")}} 
+        {{input_Form(formReceta.totalGalletas, class="form-control")}}
+    </div>
+    <input type="hidden" name="csrf_token" value="{{csrf_token()}}"/>
+    <input type="submit" id="mandarMerma" class="btn btn-danger" name="mandarMerma" value="ENVIAAAR"/>
+</form>
+</div>
+{% endblock %}
