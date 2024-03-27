@@ -9,7 +9,6 @@ from flask import flash
 from models import db
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
-
 csrf=CSRFProtect()
 
 @app.route("/login", methods=["GET", "POST"])
@@ -45,9 +44,9 @@ def page_not_found(e):
 
 if __name__ == "__main__":
     csrf.init_app(app)
-    """ db.init_app(app)
+    db.init_app(app)
     with app.app_context():
-        db.create_all() """
+        db.create_all() 
     app.run(debug=True)
 
 
