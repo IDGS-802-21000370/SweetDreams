@@ -1,0 +1,45 @@
+{% extends 'layoutPrincipal.html' %}
+{% from "_macros.html" import input_Form %}
+{% block content %}
+
+<style>
+    .card-body + .card-body {
+        border-top: 1px solid #eee; /* Opcional: añade una línea divisoria */
+        margin-top: -20px; /* Ajusta según sea necesario para acercar */
+    }
+</style>
+
+<div class="container mt-5">
+    <h1 class="mb-4">Dashboard</h1>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Ventas Diarias</h5>
+                    <p class="card-text">Aquí puedes ver las ventas diarias.</p>
+                    <img style="max-width: 100%;" src="data:image/png;base64,{{ plot_url_ventas_diarias }}" alt="Gráfico de Ventas Diarias">
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Productos Más Vendidos</h5>
+                    <p class="card-text">Aquí puedes ver los productos más vendidos.</p>
+                    <img style="max-width: 100%;" src="data:image/png;base64,{{ plot_url_productos_vendidos }}" alt="Gráfico de Productos Más Vendidos">
+                </div>
+            </div>
+        </div> 
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Presentaciones Más Vendidos</h5>
+                    <p class="card-text">Aquí puedes ver los productos más vendidos.</p>
+                    <img style="max-width: 100%;" src="data:image/png;base64,{{ plot_url_ventas_tipo }}" alt="Gráfico de Presentaciones mas vendidas">
+                </div>
+            </div>
+        </div>       
+    </div>
+</div>
+
+{% endblock %}

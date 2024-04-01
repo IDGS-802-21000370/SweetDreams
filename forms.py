@@ -48,3 +48,15 @@ class CompraForm(Form):
 
         materias_primas = MateriasPrimas.query.all()
         self.idMateriaPrima.choices = [(materia.id_materiaPrima, materia.nombre) for materia in materias_primas]
+class UsuarioForm(Form):
+    id_usuario=IntegerField("id")
+    nombre = StringField("Nombre", [validators.DataRequired(message="el campo es requerido"), 
+                         validators.Length(min=1, max=30, message="ingresa nombre valido")])
+    nombreUsuario = StringField("Nombre de usuario", [validators.DataRequired(message="el campo es requerido"), 
+                         validators.Length(min=1, max=30, message="ingresa usuario valido")])
+    contrasenia = StringField("Contraseña", [validators.DataRequired(message="el campo es requerido"), 
+                         validators.Length(min=1, max=30, message="ingresa contraseña valida")])
+    puesto = StringField("Puesto", [validators.DataRequired(message="el campo es requerido"), 
+                         validators.Length(min=1, max=30, message="ingresa puesto valido")])
+    rol = StringField("Rol", [validators.DataRequired(message="el campo es requerido"), 
+                         validators.Length(min=1, max=30, message="ingresa rol valido")])
