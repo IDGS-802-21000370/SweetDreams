@@ -38,6 +38,7 @@ class Proveedor(db.Model):
     direccion = db.Column(db.String(100))
     contacto = db.Column(db.String(100))
     fecha_creacion = db.Column(db.DateTime, default=datetime.datetime.now)
+    estatus = db.Column(db.Integer, default=1)
 
 class DetalleCompra(db.Model):
     id_detalleCompra = db.Column(db.Integer, primary_key=True)
@@ -47,6 +48,10 @@ class DetalleCompra(db.Model):
     materiasprimas_id_materiaPrima = db.Column(db.Integer, db.ForeignKey('materias_primas.id_materiaPrima'))
     proveedor_id_proveedor = db.Column(db.Integer, db.ForeignKey('proveedor.id_proveedor'))
     fecha_creacion = db.Column(db.DateTime, default=datetime.datetime.now)
+
+    materia_prima = db.relationship('MateriasPrimas', backref='detalle_compra')
+    proveedor = db.relationship('Proveedor', backref='detalle_compra')
+    tipo_medida = db.relationship('TipoMedidasMaterialPrimas', backref='detalle_compra')
 
 class Caja(db.Model):
     id_caja = db.Column(db.Integer, primary_key=True)
