@@ -7,3 +7,6 @@ class LoginForm(Form):
                          validators.Length(min=1, max=10, message="ingresa nombre valido")])
     contrasenia = StringField("Contraseña", [validators.DataRequired(message="el campo es requerido"), 
                          validators.Length(min=1, max=10, message="ingresa nombre valido")])
+class mermas(Form):
+     nombre = StringField("nombre",[validators.DataRequired(message='el campo es requerido'), validators.Length(min=4,max=10,message='ingresa nombre valido')])
+     fecha_creacion = StringField("fecha_creacion")

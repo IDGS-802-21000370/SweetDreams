@@ -1,0 +1,97 @@
+{% extends 'layoutPrincipal.html' %}
+{% from "_macros.html" import input_Form %}
+{% block content %}
+
+
+<div class="content">
+    <h2>Selecciona una galleta para producir:</h2>
+    <div id="botonesGalletas">
+        
+        <form action="/produccionGalleta" method="post">
+            
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div id="botonesGalletas">
+                <button class="product-btn" type="submit" name="galleta" value="Chispas de Chocolate">Chispas de Chocolate</button>
+                <button class="product-btn" type="submit" name="galleta" value="Mantequilla">Mantequilla</button>
+                <button class="product-btn" type="submit" name="galleta" value="Avena">Avena</button>
+                <button class="product-btn" type="submit" name="galleta" value="Macarrones">Macarrones</button>
+                <button class="product-btn" type="submit" name="galleta" value="Jengibre">Jengibre</button>
+                <button class="product-btn" type="submit" name="galleta" value="Polvorones">Polvorones</button>
+                <button class="product-btn" type="submit" name="galleta" value="Pastisetas">Pastisetas</button>
+                <button class="product-btn" type="submit" name="galleta" value="Nuez">Nuez</button>
+                <button class="product-btn" type="submit" name="galleta" value="Coco">Coco</button>
+                <button class="product-btn" type="submit" name="galleta" value="Almendras">Almendras</button>
+            </div>  </form>
+            <div class="hamburger-menu" onclick="toggleMenu()">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+            
+            <div id="menu" class="menu">
+                <ul>
+                    <li></li>
+                    <li></li>
+                   
+                </ul>
+                
+                <div>
+                    <h2>Galletas en Preparación:</h2>
+                    <ul id="galletasEnPreparacion">
+                        {% for galleta in galletas_en_preparacion %}
+                        <li>{{ galleta }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            
+                <div>
+                    <h2>Galletas Preparadas:</h2>
+                    <ul id="galletasPreparadas">
+                        {% for galleta in galletas_preparadas %}
+                        <li>{{ galleta }}</li>
+                        {% endfor %}
+                    </ul>
+                    <form action="/enviarMostrador" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <input type="submit" value="Enviar al Mostrador">
+                    </form>
+            
+                </div>
+            </div>
+      
+    </div>
+</div>
+
+<style>
+    
+
+    .content {
+        padding: 20px;
+    }
+
+    .product-btn {
+        display: block;
+        width: 200px;
+        margin: 10px auto;
+        padding: 10px;
+        background-color: #4CAF50;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .product-btn:hover {
+        background-color: #45a049;
+    }
+</style>
+</head>
+
+
+
+<script>
+     
+</script>
+{% endblock %}
