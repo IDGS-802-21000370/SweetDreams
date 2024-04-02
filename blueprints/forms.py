@@ -1,7 +1,8 @@
 from wtforms import Form
 from wtforms import StringField, TextAreaField, SelectField, RadioField, IntegerField, EmailField, BooleanField, DateField
 from wtforms import validators
-from models import TipoMedidasMaterialPrimas, MateriasPrimas, Proveedor
+from blueprints.models import MateriasPrimas, Proveedor, TipoMedidasMaterialPrimas
+
 
 class LoginForm(Form):
     usuario = StringField("Nombre de usuario", [validators.DataRequired(message="el campo es requerido"), 

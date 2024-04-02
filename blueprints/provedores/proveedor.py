@@ -1,7 +1,6 @@
-import forms
-from models import db
+import blueprints.forms as forms
 from flask import Flask, request, render_template, Response, redirect, url_for
-from models import db, Proveedor
+from blueprints.models import db, Proveedor
 
 
 def indexP():

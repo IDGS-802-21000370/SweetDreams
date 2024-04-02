@@ -3,7 +3,7 @@ from cgitb import text
 
 import os
 from flask import Flask, render_template,request,Response
-import forms
+import blueprints.forms as forms
 from sqlalchemy import cast
 from flask_wtf.csrf import CSRFProtect
 from flask import g

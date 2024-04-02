@@ -1,27 +1,17 @@
 import threading
 from cgitb import text
 from datetime import datetime
-
 import os
 from flask import Flask, render_template,request,Response
-import forms
+import blueprints.forms as forms
 from sqlalchemy import cast
 from flask_wtf.csrf import CSRFProtect
 from flask import g
 from flask import flash
-from config import DevelopmentConfig
-
-from flask import Flask, current_app
+from blueprints.config import DevelopmentConfig
 from flask_sqlalchemy import SQLAlchemy
-from models import DetalleGalleta, DetalleMateriaPrima, Galleta, Receta,DetalleReceta, MateriasPrimas, db
+from blueprints.models import DetalleGalleta, DetalleMateriaPrima, Galleta, Receta,DetalleReceta, MateriasPrimas, db
 
-from config import DevelopmentConfig
-
-app = Flask(__name__)
-app.config.from_object(DevelopmentConfig)
-
-
-csrf=CSRFProtect()
 
 class Guardar:
     tiempos_galletas = {
@@ -41,7 +31,7 @@ class Guardar:
     def galletasenpreparacion(galleta):
         # Agregar la galleta al archivo de galletas en preparación
         Guardar.escribir_galleta_en_preparacion(galleta)
-        with open("galletas_en_preparacion.txt", "a") as file:
+        with open("blueprints/produccion/galletas_en_preparacion.txt", "a") as file:
             print("chi")
         # Iniciar un hilo para mover la galleta a las galletas preparadas después del tiempo especificado
         tiempo = Guardar.tiempos_galletas.get(galleta, 10)
@@ -51,7 +41,7 @@ class Guardar:
     @staticmethod
     def escribir_galleta_en_preparacion(galleta):
         try:
-            with open("galletas_en_preparacion.txt", "a") as file:
+            with open("blueprints/produccion/galletas_en_preparacion.txt", "a") as file:
                 file.write(f"{galleta}\n")
             print(f"Galleta {galleta} agregada a la lista de preparación.")
         except Exception as e:
@@ -61,18 +51,18 @@ class Guardar:
     def galletaspreparadas(galleta):
         try:
             # Mover la galleta al archivo de galletas preparadas
-            with open("galletas_en_preparacion.txt", "r") as file:
+            with open("blueprints/produccion/galletas_en_preparacion.txt", "r") as file:
                 lines = file.readlines()
-            with open("galletas_en_preparacion.txt", "w") as file:
+            with open("blueprints/produccion/galletas_en_preparacion.txt", "w") as file:
                 for line in lines:
                     if line.strip() != galleta:
                         file.write(line)
 
-            with open("galletas_preparadas.txt", "a") as file:
+            with open("blueprints/produccion/galletas_preparadas.txt", "a") as file:
                 file.write(f"{galleta}\n")
               
             print(f"Galleta {galleta} preparada y agregada a la lista de galletas preparadas.")
-            with open("galletas_preparadas.txt", "r") as file:
+            with open("blueprints/produccion/galletas_preparadas.txt", "r") as file:
                  file.readlines()
        
             # Recargar la página después de que se complete el tiempo
@@ -88,7 +78,7 @@ class Guardar:
         try:
             with app.app_context():
                 # Leer el archivo de galletas preparadas y buscar en la base de datos las recetas correspondientes
-                with open("galletas_preparadas.txt", "r") as file:
+                with open("blueprints/produccion/galletas_preparadas.txt", "r") as file:
                     galletas_preparadas = file.readlines()
                     for galleta_line in galletas_preparadas:
                         galleta_nombre = galleta_line.strip()  # Eliminar espacios en blanco y saltos de línea
@@ -134,21 +124,11 @@ class Guardar:
                                         # Pasar al siguiente registro según la fecha de caducidad y mermado=0
                                         detalle_materia_prima = DetalleMateriaPrima.query.filter_by(materia_prima_id=materia_prima_id, mermado=0).filter(DetalleMateriaPrima.caducidad > detalle_materia_prima.caducidad).order_by(DetalleMateriaPrima.caducidad.asc()).first()
                     
-                with open("galletas_preparadas.txt", "w") as file:
+                with open("blueprints/produccion/galletas_preparadas.txt", "w") as file:
                     file.truncate(0)
                 print("Galletas enviadas al mostrador correctamente.")
         except Exception as e:
             print(f"Error al enviar galletas al mostrador: {e}")
 
 
-if __name__ == "__main__":
-    # Ejemplo de uso
-     # Ejemplo de uso
-    csrf.init_app(app)
-    db.init_app(app)
-    with app.app_context():
-        db.create_all()
-   
-    
-    Guardar.mandar_mostrador(app)  # Utiliza el tiempo definido en el diccionario
-    #Guardar.mandar_mostrador(app)
+
