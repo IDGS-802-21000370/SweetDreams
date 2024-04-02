@@ -1,0 +1,94 @@
+{% extends 'layoutPrincipal.html' %}
+{% from "_macros.html" import input_Form %}
+{% block content %}
+
+<style>
+    .card-body + .card-body {
+        border-top: 1px solid #eee; /* Opcional: añade una línea divisoria */
+        margin-top: -20px; /* Ajusta según sea necesario para acercar */
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="container py-5">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="col-xl-10">
+                <div class="card rounded-3 text-black">
+                    <div class="row g-0">
+                        <div class="col-lg-6">
+                            <div class="card-body p-md-4 mx-md-3">
+                                <div class="text-center">
+                                    <h4 class="mt-1 mb-4 pb-1">Registro de usuario</h4>
+                                </div>
+                                <form method="POST" action="/usuario">
+                                    
+                                    <div class="form-outline mb-4">
+                                        {{ input_Form(formUsuario.nombre, class="form-control", placeholder="Nombre") }}
+                                    </div>
+                                    <div class="form-outline mb-4">
+                                        {{ input_Form(formUsuario.nombreUsuario, class="form-control", placeholder="Usuario") }}
+                                    </div>
+                                    <div class="form-outline mb-4">
+                                        {{ input_Form(formUsuario.contrasenia, class="form-control", placeholder="Contraseña") }}
+                                    </div>
+                                    <div class="form-outline mb-4">
+                                        {{ input_Form(formUsuario.puesto, class="form-control", placeholder="Puesto") }}
+                                    </div>
+                                    <div class="form-outline mb-4">
+                                        {{ input_Form(formUsuario.rol, class="form-control", placeholder="Rol") }}
+                                    </div>
+                                    <div class="text-center pt-1 mb-5 pb-1">
+                                        <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+                                        <input type="submit" name="registrar" value="Registrarse" class="btn btn-success" />
+                                        <input type="submit" name="actualizar" value="Actualizar" class="btn btn-warning"/>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card-body p-md-4 mx-md-3">
+                                <h4 class="mb-4">Lista de usuarios</h4>
+                                <form method="POST" action="/usuario">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Nombre</th>
+                                                <th>Usuario</th>
+                                                <th>Puesto</th>
+                                                <th>Rol</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for usuario in usuarios %}
+                                            <tr>
+                                                
+                                                <td>{{ usuario.nombre }}</td>
+                                                <td>{{ usuario.nombreUsuario }}</td>
+                                                <td>{{ usuario.puesto }}</td>
+                                                <td>{{ usuario.rol }}</td>
+                                                <td>
+                                                    <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+                                                    <input type="hidden" name="usuario_id" value="{{ usuario.id_usuario }}">
+                                                    <button type="submit" name="accion" value="editar_{{ usuario.id_usuario }}" class="btn btn-sm btn-warning">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </button>
+                                                    <button type="submit" name="eliminar" value="{{ usuario.id_usuario }}" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar este usuario?')">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
