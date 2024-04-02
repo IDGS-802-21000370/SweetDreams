@@ -7,4 +7,4 @@ class Config():
 
 class DevelopmentConfig(Config):
     DEBUG=True
-    SQLALCHEMY_DATABASE_URI='mysql+pymysql://root:losverdes@localhost/SweetDreams'
+    SQLALCHEMY_DATABASE_URI='mysql+pymysql://root:losverdes@localhost/sweetsdreams'

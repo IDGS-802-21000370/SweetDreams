@@ -10,10 +10,10 @@ class LoginForm(Form):
     
 
 class RecetaForm(Form):
-    id = IntegerField("id")
-    nombreReceta = StringField("Nombre de la receta", [validators.DataRequired(message='el campo es requerido'), validators.Length(min=1, max=20, message='ingresa nombre valido')])
-    descripcion = TextAreaField("Descripcion", [validators.DataRequired(message='el campo es requerido'), validators.Length(min=1, max=150, message='ingresa una descripcion valida')])
-    totalGalletas = IntegerField("Total de las galletas")
-    cantidad = IntegerField("Cantidad")
+    id_receta = StringField("id")
+    nombreReceta = StringField("Nombre de la receta")
+    descripcion = TextAreaField("Descripcion")
+    totalGalletas = StringField("Total de las galletas")
+    cantidad = StringField("Cantidad")
     #materiasPrimas = RadioField("Selecciona")
-    tipoMedida = SelectField(choices=[(0, 'Selecciona'), (1,'Gramos'), (2,'Pieza'), (3, 'Mililitros'), (4,'Costal')])
+    tipoMedida = SelectField(choices=[(0, 'Selecciona'), (1,'Gramos'), (2,'Piezas'), (3, 'Mililitros'), (4,'Costales')])

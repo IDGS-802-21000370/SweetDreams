@@ -4,27 +4,29 @@
 <div class="container">
     <div class="row">
         <div class="col-6">
-            <h1 class="tituloInventario">Materia Prima</h1>
+            <h2 class="titulos">Materia Prima</h2>
             <table class="table table-bordered">
                 <tr>
                     <th>Nombre</th>
                     <th>Cantidad</th>
+                    <th>Tipo de medida</th>
                     <th>Caducidad</th>
                     <th>Mandar a merma</th>
                 </tr>
                 {% for mp in materiasPrimas %}
                 <tr>
-                    <td>{{ mp['nombre'] }}</td>
-                    <td>{{ mp['cantidad'] }}</td>
-                    <td>{{ mp['caducidad'] }}</td>
-                    <td><input type="submit" id="mandarMerma" class="btn btn-danger" name="mandarMerma" value="{{ mp['id_materiasPrimas'] }}"/> </td>                        
+                    <td>{{ mp.nombre }}</td>
+                    <td>{{ mp.cantidad }}</td>
+                    <td>{{ mp.tipomedidasmaterialprimas_id_medida }}</td>
+                    <td>{{ mp.caducidad }}</td>
+                    <td><input type="submit" id="mandarMerma" class="btn btn-danger" name="mandarMerma" value="{{ mp.id_materiaPrima }}"/> </td>                        
                 </tr>
                 {% endfor %}
             </table>
         </div>
 
         <div class="col-6">
-            <h1 class="tituloInventario">Galletas</h1>
+            <h2 class="titulos">Galletas</h2>
             <table class="table table-bordered">
                 <tr>
                     <th>Nombre</th>
@@ -34,10 +36,10 @@
                 </tr>
                 {% for g in galletas %}
                 <tr>
-                    <td>{{ g['nombre'] }}</td>
-                    <td>{{ g['cantidad'] }}</td>
-                    <td>{{ g['caducidad'] }}</td>
-                    <td><input type="submit" id="mandarMerma" class="btn btn-danger" name="mandarMerma" value="{{ g['id'] }}"/> </td>                        
+                    <td>{{ g.nombre }}</td>
+                    <td>{{ g.cantidad }}</td>
+                    <td>{{ g.caducidad }}</td>
+                    <td><input type="submit" id="mandarMerma" class="btn btn-danger" name="mandarMerma" value="{{ g.id_galleta }}"/> </td>                        
                 </tr>
                 {% endfor %}
             </table>

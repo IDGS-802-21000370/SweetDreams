@@ -21,7 +21,7 @@ class Compra(db.Model):
     totalCompra = db.Column(db.String(100))
     fecha_actualiza = db.Column(db.DateTime)
     usuario_id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id_usuario'))
-    """usuario = db.relationship('Usuario', backref='compras')"""
+    usuario = db.relationship('Usuario', backref='compras')
 
 class MateriasPrimas(db.Model):
     id_materiaPrima = db.Column(db.Integer, primary_key=True)
@@ -30,7 +30,7 @@ class MateriasPrimas(db.Model):
     caducidad = db.Column(db.DateTime)
     fecha_creacion = db.Column(db.DateTime, default=datetime.datetime.now)
     tipomedidasmaterialprimas_id_medida = db.Column(db.Integer, db.ForeignKey('tipo_medidas_material_primas.id_medida'))
-    """tipo_medida = db.relationship('TipoMedidasMaterialPrimas', backref='materias_primas')"""
+    tipo_medida = db.relationship('TipoMedidasMaterialPrimas', backref='materias_primas')
 
 class Proveedor(db.Model):
     id_proveedor = db.Column(db.Integer, primary_key=True)
@@ -60,8 +60,8 @@ class CajaRetiro(db.Model):
     fecha_creacion = db.Column(db.DateTime, default=datetime.datetime.now)
     caja_id_caja = db.Column(db.Integer, db.ForeignKey('caja.id_caja'))
     compra_id_compra = db.Column(db.Integer, db.ForeignKey('compra.id_compra'))
-    """caja = db.relationship('Caja', backref='caja_retiros')
-    compra = db.relationship('Compra', backref='compra_retiros')"""
+    caja = db.relationship('Caja', backref='caja_retiros')
+    compra = db.relationship('Compra', backref='compra_retiros')
 
 class Receta(db.Model):
     id_receta = db.Column(db.Integer, primary_key=True)
@@ -77,9 +77,9 @@ class DetalleReceta(db.Model):
     receta_id_receta = db.Column(db.Integer, db.ForeignKey('receta.id_receta'))
     materiasprimas_id_materiaPrima = db.Column(db.Integer, db.ForeignKey('materias_primas.id_materiaPrima'))
     tipomedidasmaterialprimas_id_medida = db.Column(db.Integer, db.ForeignKey('tipo_medidas_material_primas.id_medida'))
-    """receta = db.relationship('Receta', backref='detalles_recetas')
+    receta = db.relationship('Receta', backref='detalles_recetas')
     materias_primas = db.relationship('MateriasPrimas', backref='detalles_recetas')
-    tipo_medida = db.relationship('TipoMedidasMaterialPrimas', backref='detalles_recetas')"""
+    tipo_medida = db.relationship('TipoMedidasMaterialPrimas', backref='detalles_recetas')
 
 class TipoVenta(db.Model):
     id_tipoVenta = db.Column(db.Integer, primary_key=True)
@@ -91,8 +91,8 @@ class Venta(db.Model):
     fecha_creacion = db.Column(db.DateTime, default=datetime.datetime.now)
     caja_id_caja = db.Column(db.Integer, db.ForeignKey('caja.id_caja'))
     usuario_id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id_usuario'))
-    """ caja = db.relationship('Caja', backref='ventas')
-    usuario = db.relationship('Usuario', backref='ventas')"""
+    caja = db.relationship('Caja', backref='ventas')
+    usuario = db.relationship('Usuario', backref='ventas')
 
 class Galleta(db.Model):
     id_galleta = db.Column(db.Integer, primary_key=True)
@@ -107,7 +107,7 @@ class Galleta(db.Model):
     precioPaquete2 = db.Column(db.Float)
     fecha_creacion = db.Column(db.DateTime, default=datetime.datetime.now)
     receta_id_receta = db.Column(db.Integer, db.ForeignKey('receta.id_receta'))
-    """receta = db.relationship('Receta', backref='galletas')"""
+    receta = db.relationship('Receta', backref='galletas')
 
 class DetalleVentas(db.Model):
     id_detalleVentas = db.Column(db.Integer, primary_key=True)
@@ -115,9 +115,9 @@ class DetalleVentas(db.Model):
     venta_id_venta = db.Column(db.Integer, db.ForeignKey('venta.id_venta'))
     tipoventa_id_tipoVenta = db.Column(db.Integer, db.ForeignKey('tipo_venta.id_tipoVenta'))
     galleta_id_galleta = db.Column(db.Integer, db.ForeignKey('galleta.id_galleta'))
-    """venta = db.relationship('Venta', backref='detalles_ventas')
+    venta = db.relationship('Venta', backref='detalles_ventas')
     tipo_venta = db.relationship('TipoVenta', backref='detalles_ventas')
-    galleta = db.relationship('Galleta', backref='detalles_ventas')"""
+    galleta = db.relationship('Galleta', backref='detalles_ventas')
 
 class TipoMerma(db.Model):
     id_tipoMerma = db.Column(db.Integer, primary_key=True)
@@ -129,7 +129,7 @@ class Merma(db.Model):
     tipomerma_id_tipoMerma = db.Column(db.Integer, db.ForeignKey('tipo_merma.id_tipoMerma'))
     materiasprimas_id_materiaPrima = db.Column(db.Integer, db.ForeignKey('materias_primas.id_materiaPrima'))
     galleta_id_galleta = db.Column(db.Integer, db.ForeignKey('galleta.id_galleta'))
-    """tipo_merma = db.relationship('TipoMerma', backref='mermas')
+    tipo_merma = db.relationship('TipoMerma', backref='mermas')
     materias_primas = db.relationship('MateriasPrimas', backref='mermas')
-    galleta = db.relationship('Galleta', backref='mermas')"""
+    galleta = db.relationship('Galleta', backref='mermas')
 
