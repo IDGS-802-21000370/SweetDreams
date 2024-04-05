@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 import datetime
+from flask_login import UserMixin
 
 db=SQLAlchemy()
 
@@ -7,14 +8,17 @@ class TipoMedidasMaterialPrimas(db.Model):
     id_medida = db.Column(db.Integer, primary_key=True)
     descripcion = db.Column(db.String(100))
 
-class Usuario(db.Model):
+class Usuario(db.Model, UserMixin):
     id_usuario = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100))
     nombreUsuario = db.Column(db.String(100))
     contrasenia = db.Column(db.String(100))
     puesto = db.Column(db.String(100))
     rol = db.Column(db.String(100))
+    estatus = db.Column(db.Integer)
     fecha_creacion = db.Column(db.DateTime, default=datetime.datetime.now)
+    def get_id(self):
+        return str(self.id_usuario)
 
 class Compra(db.Model):
     id_compra = db.Column(db.Integer, primary_key=True)

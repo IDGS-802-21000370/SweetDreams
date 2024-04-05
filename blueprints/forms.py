@@ -2,9 +2,10 @@ from wtforms import Form
 from wtforms import StringField, TextAreaField, SelectField, RadioField, IntegerField, EmailField, BooleanField, DateField
 from wtforms import validators
 from blueprints.models import MateriasPrimas, Proveedor, TipoMedidasMaterialPrimas
+from flask_wtf import FlaskForm
 
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     usuario = StringField("Nombre de usuario", [validators.DataRequired(message="el campo es requerido"), 
                          validators.Length(min=1, max=10, message="ingresa nombre valido")])
     contrasenia = StringField("Contraseña", [validators.DataRequired(message="el campo es requerido"), 
