@@ -13,11 +13,20 @@ from blueprints.error.error import error_blueprint
 from blueprints.mermas.mermas import mermas_blueprint
 from blueprints.provedores.provedor import proveedor_blueprint
 from blueprints.compras.compra import compra_blueprint
+from blueprints.models import Usuario
+from flask_login import LoginManager
 
 app = Flask(__name__)
 csrf = CSRFProtect()
-app.config.from_object(DevelopmentConfig)
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Usuario.query.get(int(user_id))
+
 app.register_blueprint(login_blueprint)
+app.config.from_object(DevelopmentConfig)
 app.register_blueprint(produccion_blueprint)
 app.register_blueprint(usuario_blueprint)
 app.register_blueprint(dashboard_blueprint)

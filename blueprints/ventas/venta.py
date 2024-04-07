@@ -12,11 +12,23 @@ from reportlab.lib.units import inch
 w, h = LETTER
 
 venta_blueprint = Blueprint("ventas", __name__, template_folder="templates")
-
+quedan_galletas = {
+    "Chispas de Chocolate": 15,  
+    "Mantequilla": 10,              
+    "Avena": 9,                 
+    "Macarrones" :6,
+    "Jengibre":15,
+    "Polvorones":25,
+    "Pastisetas":25,
+    "Nuez":20,
+    "Coco":7,
+    "Almendras":7,
+}
 menu_items = []
 @venta_blueprint.route("/ventas", methods=["GET", "POST"])
 def ventas():
     galletas=Galleta.query.all()
+    galletasc = Galleta.query.filter(Galleta.cantidad < 10).all()
     if request.method=="POST":
         if 'agregarPieza' in request.form or 'agregarPaq1' in request.form or 'agregarPaq2' in request.form:
             if 'agregarPieza' in request.form:
@@ -62,7 +74,7 @@ def ventas():
                 menu_items.append({"id_galleta": id_galleta, "cantidad": cantidad, "nombre": nombre, "precio": precio, "tipoVenta": id_tipoVenta})
 
             totalVenta = sum(item["precio"] for item in menu_items)
-            return render_template('ventas/ventas.html', galletas=galletas, menu_items=menu_items, totalVenta=totalVenta)
+            return render_template('ventas/ventas.html', galletas=galletas, menu_items=menu_items, totalVenta=totalVenta, galletasc=galletasc)
         elif 'vender' in request.form:
             totalVenta = sum(item["precio"] for item in menu_items)
             if totalVenta == 0:
@@ -196,4 +208,13 @@ def ventas():
                 caja.fecha_creacion = datetime.datetime.now()
                 db.session.commit()
                 return render_template('ventas/ventas.html', galletas=galletas, modalRetiroExitoso=True)
-    return render_template('ventas/ventas.html', galletas=galletas)
+    return render_template('ventas/ventas.html', galletas=galletas,galletasc=galletasc)
+""" =======
+            
+            if not encontrado:
+                menu_items.append({"id_galleta": id_galleta, "nombre": nombre, "precio": precio})
+                
+        return render_template('ventas/ventas.html', galletas=galletas, menu_items=menu_items,galletasc=galletasc)
+    
+    return render_template('ventas/ventas.html', galletas=galletas,galletasc=galletasc)
+>>>>>>> main """
