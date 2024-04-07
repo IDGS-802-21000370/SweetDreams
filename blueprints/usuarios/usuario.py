@@ -26,14 +26,13 @@ def usuario():
             usuario_id = int(usuario_id_str)
             if accion == 'editar':
                 usuario_editar = Usuario.query.get_or_404(usuario_id)
-                
                 usuarioForm.id_usuario.data=usuario_editar.id_usuario
                 usuarioForm.nombre.data = usuario_editar.nombre
                 usuarioForm.nombreUsuario.data = usuario_editar.nombreUsuario
                 usuarioForm.contrasenia.data = usuario_editar.contrasenia
                 usuarioForm.puesto.data = usuario_editar.puesto
                 usuarioForm.rol.data = usuario_editar.rol
-                return render_template("usuario.html", formUsuario=usuarioForm, usuarios=usuarios)
+                return render_template("usuario/usuario.html", formUsuario=usuarioForm, usuarios=usuarios)
         elif 'actualizar' in request.form:
             nombre_usuario = usuarioForm.nombreUsuario.data
             usuario_actualizar = Usuario.query.filter_by(nombreUsuario=nombre_usuario).first()
