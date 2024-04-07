@@ -56,6 +56,7 @@ class DetalleCompra(db.Model):
 class Caja(db.Model):
     id_caja = db.Column(db.Integer, primary_key=True)
     dineroTotal = db.Column(db.Integer)
+    contrasenia = db.Column(db.String(20))
     fecha_creacion = db.Column(db.DateTime, default=datetime.datetime.now)
 
 class CajaRetiro(db.Model):
