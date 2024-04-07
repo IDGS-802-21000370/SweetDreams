@@ -3,13 +3,103 @@
 {% block content %}
 
 
+
 <div class="content">
+    <style>
+        /* Estilos para el modal */
+        .modal {
+            display: none; /* Por defecto, oculto */
+            position: fixed; /* Posición fija */
+            z-index: 1; /* Por encima de todo */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* Permite desplazamiento */
+            background-color: rgb(0,0,0); /* Fondo negro semitransparente */
+            background-color: rgba(0,0,0,0.4); /* Fondo negro semitransparente */
+        }
+
+        /* Estilos para el contenido del modal */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* Margen superior e inferior para centrar verticalmente */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Ancho del contenido del modal */
+        }
+
+        /* Estilos para el botón de cerrar el modal */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head> 
+<body>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <!-- Contenido del modal -->
+            <h2>Estas son tus galletas que estan listas para mandar a mostrador</h2>
+          
+            
+            
+            {% for galleta in  galletas_preparadaditas %}
+            <tr>
+                <td>{{ galleta }}</td>
+                <!-- Aquí puedes añadir la cantidad si lo deseas -->
+                <td>1</td>
+            </tr>
+            {% endfor %}
+            <button onclick="window.location.href = 'produccionGalleta';">ok</button>
+        </div>
+    </div>
+ 
+    <!-- Script JavaScript para mostrar el modal automáticamente -->
+    <script>
+        // Función para abrir el modal automáticamente al cargar la página
+        window.onload = function() {
+            document.getElementById("myModal").style.display = "block";
+        };
+
+        // Seleccionar el modal y el botón para cerrarlo
+        var modal = document.getElementById("myModal");
+        var span = document.getElementsByClassName("close")[0];
+
+        // Cuando el usuario haga clic en <span> (x), cerrar el modal
+        span.onclick = function() {
+            modal.style.display = "none"; // Ocultar el modal
+        }
+
+        // Cuando el usuario haga clic en cualquier lugar fuera del modal, cerrarlo
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none"; // Ocultar el modal
+            }
+        }
+        
+
+
+        
+    </script>
     <h2>Selecciona una galleta para producir:</h2>
     <div id="botonesGalletas">
-        
-        <form action="/produccionGalleta" method="post">
+        <form action="/produccionGalleta" method="post" id="registro"> <!-- Agregué un ID al formulario -->
             
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="accion" id="accion" value="Guardar">
             <div id="botonesGalletas">
                 <button class="product-btn" type="submit" name="galleta" value="Chispas de Chocolate">Chispas de Chocolate</button>
                 <button class="product-btn" type="submit" name="galleta" value="Mantequilla">Mantequilla</button>
@@ -21,7 +111,7 @@
                 <button class="product-btn" type="submit" name="galleta" value="Nuez">Nuez</button>
                 <button class="product-btn" type="submit" name="galleta" value="Coco">Coco</button>
                 <button class="product-btn" type="submit" name="galleta" value="Almendras">Almendras</button>
-            </div>  </form>
+            </div>  
             <div class="hamburger-menu" onclick="toggleMenu()">
                 <div class="line"></div>
                 <div class="line"></div>
@@ -49,22 +139,72 @@
                     <ul id="galletasPreparadas">
                         {% for galleta in galletas_preparadas %}
                         <li>{{ galleta }}</li>
+                        {% if galleta_enviada_al_mostrador %}
+                            <script>
+                                // Obtener el nombre de la galleta enviada al mostrador
+                                var galleta_enviada = "{{ galleta_enviada_al_mostrador }}";
+                                
+                                // Definir los tiempos de las galletas preparadas
+                                var tiempos_galletas = {
+                                    "Chispas de Chocolate": 10,  
+                                    "Mantequilla": 10,              
+                                    "Avena": 9,                 
+                                    "Macarrones" :100,
+                                    "Jengibre":15,
+                                    "Polvorones":1,
+                                    "Pastisetas":1,
+                                    "Nuez":10,
+                                    "Coco":1,
+                                    "Almendras":1,
+                                };
+                                
+                                // Obtener el tiempo de espera según la galleta enviada al mostrador
+                                var tiempo_espera = tiempos_galletas[galleta_enviada] || 10; // 10 segundos por defecto si el tiempo no está definido
+                                
+                                // Mostrar la confirmación después del tiempo especificado
+                                setTimeout(function() {
+                                    var confirmacion = confirm("¡La galleta " + galleta_enviada + " está lista! ¿Quieres pasarla al mostrador?");
+                                    if (confirmacion) {
+                                        document.getElementById('accion').value = 'Enviar al Mostrador';
+                                        document.getElementById('registro').submit();
+                                    } else {
+                                        window.location.href;
+                                    }
+                                }, tiempo_espera * 1000); // Convertir segundos a milisegundos
+                            </script>
+                        {% endif %}
                         {% endfor %}
                     </ul>
-                    <form action="/enviarMostrador" method="post">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                        <input type="submit" value="Enviar al Mostrador">
-                    </form>
-            
                 </div>
+                <input class="product-btn" type="submit" value="Enviar al Mostrador" onclick="document.getElementById('accion').value = 'Enviar al Mostrador'">
+                <input class="product-btn" type="submit" value="Mostrar galletas en Preparacion" onclick="document.getElementById('accion').value = 'Mostrar galletas en Preparacion'">
+                <input class="product-btn" type="submit" value="Mostrar galletas Preparadas" onclick="document.getElementById('accion').value = 'Mostrar galletas Preparadas'">
             </div>
-      
+        </form>
     </div>
 </div>
 
-<style>
+<script>
+    function toggleMenu() {
+        // Implementa tu lógica para el menú aquí
+    }
     
+       
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js" integrity="sha512-y+o2IGgYzvA33vTfVd9kQOk39mTVoyt6HdIe7N1e+Gg5FpJzX9Le7+QY/UvYx92tAys1JV5Z31lb7sY1cfsNuw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">
+    const socket = io();
 
+    // Escuchar el evento 'galleta_preparada'
+    socket.on('galleta_preparada', function(galleta) {
+        // Mostrar una alerta al usuario
+        alert('¡La galleta ' + galleta + ' está lista!');
+        
+        // Actualizar el contenido del front-end si es necesario
+        // Por ejemplo, puedes recargar una lista de galletas preparadas
+    });
+</script>
+<style>
     .content {
         padding: 20px;
     }
@@ -87,11 +227,9 @@
         background-color: #45a049;
     }
 </style>
-</head>
 
 
+   
 
-<script>
-     
-</script>
+
 {% endblock %}

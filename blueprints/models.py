@@ -136,13 +136,13 @@ class Merma(db.Model):
     caducidad = db.Column(db.DateTime)
     tipomerma_id_tipoMerma = db.Column(db.Integer, db.ForeignKey('tipo_merma.id_tipoMerma'))
     materiasprimas_id_materiaPrima = db.Column(db.Integer, db.ForeignKey('materias_primas.id_materiaPrima'))
-    galleta_id_galleta = db.Column(db.Integer, db.ForeignKey('galleta.id_galleta'))
     tipo_merma = db.relationship('TipoMerma', backref='mermas')
     id_detalle_galleta = db.Column(db.Integer, db.ForeignKey('detalle_galleta.id_detalle_galleta'))
     detallemateriaprima_id_detalle_materiaprima = db.Column(db.Integer, db.ForeignKey('detalle_materia_prima.id_detalle_materiaprima'))
-    """tipo_merma = db.relationship('TipoMerma', backref='mermas')
+    detalle = db.relationship('DetalleGalleta', backref='mermas')
+    tipo_merma = db.relationship('TipoMerma', backref='mermas')
     materias_primas = db.relationship('MateriasPrimas', backref='mermas')
-    galleta = db.relationship('Galleta', backref='mermas')"""
+   
 
 class DetalleMateriaPrima(db.Model):
     id_detalle_materiaprima = db.Column(db.Integer, primary_key=True)
@@ -160,4 +160,4 @@ class DetalleGalleta(db.Model):
     caducidad = db.Column(db.DateTime)
     mermado= db.Column(db.Integer,default=0)
     galleta_id_galleta = db.Column(db.Integer, db.ForeignKey('galleta.id_galleta'))
-    
+    galleta = db.relationship('Galleta', backref='detalle_galleta')

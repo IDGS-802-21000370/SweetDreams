@@ -2,7 +2,10 @@ import threading
 from cgitb import text
 from datetime import datetime
 import os
+import time
 from flask import Flask, render_template,request,Response
+from flask_socketio import SocketIO
+
 import blueprints.forms as forms
 from sqlalchemy import cast
 from flask_wtf.csrf import CSRFProtect
@@ -26,18 +29,35 @@ class Guardar:
         "Coco":1,
         "Almendras":1,
     }
-
+    """  def ventana2(galleta):
+        inicio=time.time()
+        tiempo = Guardar.tiempos_galletas.get(galleta, 10)
+        t=time.sleep(tiempo)
+        tiempotran=time.time()-inicio
+        if int(tiempotran)==tiempo:
+        return True
+    def ventana(galleta):
+        tiempo = Guardar.tiempos_galletas.get(galleta, 10)
+        t2=threading.Timer(tiempo, Guardar.ventana, args=[galleta])
+        t2.start()  """
+    
+    
     @staticmethod
     def galletasenpreparacion(galleta):
+       
         # Agregar la galleta al archivo de galletas en preparación
         Guardar.escribir_galleta_en_preparacion(galleta)
         with open("blueprints/produccion/galletas_en_preparacion.txt", "a") as file:
             print("chi")
         # Iniciar un hilo para mover la galleta a las galletas preparadas después del tiempo especificado
         tiempo = Guardar.tiempos_galletas.get(galleta, 10)
+        
         t = threading.Timer(tiempo, Guardar.galletaspreparadas, args=[galleta])
-        t.start()
-         
+      
+        t.start() 
+       
+
+       
     @staticmethod
     def escribir_galleta_en_preparacion(galleta):
         try:
@@ -64,15 +84,23 @@ class Guardar:
             print(f"Galleta {galleta} preparada y agregada a la lista de galletas preparadas.")
             with open("blueprints/produccion/galletas_preparadas.txt", "r") as file:
                  file.readlines()
-       
+        
             # Recargar la página después de que se complete el tiempo
-          
+            tiempo = Guardar.tiempos_galletas.get(galleta, 10)
+            t2 = threading.Timer(tiempo, Guardar.leer_galletas_preparadas)
+            t2.start()
+            #SocketIO.emit('galleta_preparada', galleta)
         except Exception as e:
             print(f"Error al agregar la galleta {galleta} a la lista de galletas preparadas: {e}")
     
     
   
-
+    @staticmethod
+    def leer_galletas_preparadas():
+        # Leer el archivo de galletas preparadas
+        with open("blueprints/produccion/galletas_preparadas.txt", "r") as file:
+            galletas_preparadas = file.readlines()
+        print("Galletas preparadas:", galletas_preparadas)
     @staticmethod
     def mandar_mostrador(app):
         try:
