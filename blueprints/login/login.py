@@ -5,6 +5,8 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_sqlalchemy import SQLAlchemy
 from blueprints.models import Usuario
+import bcrypt
+from flask import flash
 
 login_blueprint = Blueprint("login", __name__, template_folder="templates")
 
@@ -13,21 +15,25 @@ def login():
     formLogin = forms.LoginForm()
     if formLogin.validate_on_submit():
         nombreUsuario = formLogin.usuario.data
-        contrasenia = formLogin.contrasenia.data
+        contrasenia = formLogin.contrasenia.data.encode('utf-8')  
         user = Usuario.query.filter_by(nombreUsuario=nombreUsuario).first()
-        if user and user.contrasenia == contrasenia:
+
+        if user and bcrypt.checkpw(contrasenia, user.contrasenia.encode('utf-8')):
             if user.estatus == 1:
                 login_user(user)
                 if user.rol == 'admin':
-                    return redirect(url_for('login.admin'))
+                    return redirect(url_for('ventas.ventas'))
                 elif user.rol == 'usuario':
-                    return redirect(url_for('login.user'))
+                    return redirect(url_for('ventas.ventas'))
                 else:
                     return redirect(url_for('login.login'))
             else:
-                return 'El usuario no está activado'
+                flash('El usuario no está activado', 'error')
+                return redirect(url_for('login.login')) 
         else:
-            return 'Usuario o contraseña inválidos'
+            flash('Nombre de usuario o contraseña incorrecta.', 'error')
+            return redirect(url_for('login.login')) 
+
     return render_template('login/login.html', formLogin=formLogin)
 
 @login_blueprint.route('/logout')
@@ -36,14 +42,10 @@ def logout():
     logout_user()
     return redirect(url_for('login.logout'))
 
-@login_blueprint.route('/user')
+@login_blueprint.route('/venta')
 @login_required
 def user():
-    return render_template('layoutPrincipal.html')
+    return render_template('ventas/ventas.html')
 
-@login_blueprint.route('/admin')
-@login_required
-def admin():
-    return render_template('layoutPrincipal.html')
 
  

@@ -3,6 +3,8 @@ from wtforms import StringField, TextAreaField, SelectField, RadioField, Integer
 from wtforms import validators
 from blueprints.models import MateriasPrimas, Proveedor, TipoMedidasMaterialPrimas
 from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SelectField
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp
 
 
 class LoginForm(FlaskForm):
@@ -63,15 +65,21 @@ class CompraForm(Form):
 
         materias_primas = MateriasPrimas.query.all()
         self.idMateriaPrima.choices = [(materia.id_materiaPrima, materia.nombre) for materia in materias_primas]
-class UsuarioForm(Form):
+class UsuarioForm(FlaskForm):
     id_usuario=IntegerField("id")
     nombre = StringField("Nombre", [validators.DataRequired(message="el campo es requerido"), 
                          validators.Length(min=1, max=30, message="ingresa nombre valido")])
     nombreUsuario = StringField("Nombre de usuario", [validators.DataRequired(message="el campo es requerido"), 
                          validators.Length(min=1, max=30, message="ingresa usuario valido")])
-    contrasenia = StringField("Contraseña", [validators.DataRequired(message="el campo es requerido"), 
-                         validators.Length(min=1, max=30, message="ingresa contraseña valida")])
+    contrasenia = PasswordField("Contraseña", validators=[
+        DataRequired(message="El campo es requerido"),
+        Length(min=8, message='La contraseña debe tener al menos 8 caracteres'),
+        Regexp(r'[A-Z]', message='La contraseña debe contener al menos una letra mayúscula'),
+        Regexp(r'[a-z]', message='La contraseña debe contener al menos una letra minúscula'),
+        Regexp(r'\d', message='La contraseña debe contener al menos un número'),
+        Regexp(r'[!@#$%&*?]', message='La contraseña debe contener al menos un carácter especial')
+    ])
     puesto = StringField("Puesto", [validators.DataRequired(message="el campo es requerido"), 
                          validators.Length(min=1, max=30, message="ingresa puesto valido")])
-    rol = StringField("Rol", [validators.DataRequired(message="el campo es requerido"), 
-                         validators.Length(min=1, max=30, message="ingresa rol valido")])
+    roles = [("admin", "Admin"), ("usuario", "Usuario")]
+    rol = SelectField("Rol", choices=roles, validators=[validators.DataRequired(message="El campo es requerido")])
