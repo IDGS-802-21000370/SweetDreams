@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="static/css/style.css">
     <style>
         body {
-            background: linear-gradient(-150deg, #f4d2b8 30%, #cfa77b 70%);
+            background-color: rgb(255, 235, 205);
             min-height: 100vh;
             color: #333;
         }
@@ -35,7 +35,7 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg fixed-top" style="background-color: rgba(255, 255, 255)">
+    <nav class="navbar navbar-expand-lg fixed-top" style="background-color: rgb(192, 161, 116)">
         <div class="container-fluid">
             <img src="static/img/logoSweetDreamsSF.png" style="width: 40px;" alt="logo">
             <a class="navbar-brand" href="/login">Sweet Dreams</a>
@@ -46,35 +46,45 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/recetas"><i class="fas fa-utensils"></i> Recetas <span class="sr-only">(algo)</span></a>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/ventas">
+                            <i class="fas fa-money-bill-wave"></i> Ventas
+                        </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/compras">
+                            <i class="fas fa-shopping-cart"></i> Compras
+                        </a>
+                    </li>                    
                     <li class="nav-item">
                         <a class="nav-link" href="/inventario"><i class="fas fa-box-open"></i> Inventario <span class="sr-only">(algo)</span></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/produccionGalleta"><i class="fas fa-cookie-bite"></i> Producción <span class="sr-only">(algo)</span></a>
                     </li>
-                    
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/recetas"><i class="fas fa-utensils"></i> Recetas <span class="sr-only">(algo)</span></a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/mermas">
                             <i class="fas fa-trash"></i> Mermas
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/ventas">
-                            <i class="fas fa-money-bill-wave"></i> Ventas
+                        <a class="nav-link" href="/proveedores">
+                            <i class="fas fa-user-tie"></i> Proveedores
                         </a>
                     </li>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/dashboard">
-                        <i class="fas fa-chart-line"></i> Dashboard
-                    </a>
-                </li>
-                
-                    
-                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="/usuario">
+                            <i class="fas fa-user"></i> Usuarios
+                        </a>
+                    </li>                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <i class="fas fa-chart-line"></i> Dashboard
+                        </a>
+                    </li>
                 </ul>
                 <div class="ms-auto">
                     <a href="/login" class="btn btn-danger">Cerrar sesión</a> 

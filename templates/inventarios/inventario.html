@@ -69,10 +69,12 @@
                     <td>{{ productos.cantidad }}</td>
                     <td>{{ productos.caducidad }}</td>
                 </tr>
-                <button onclick="window.location.href = 'produccionGalleta';">¿Quieres hacer galletas?</button>
+               
             </div>
                 {% endfor %}
             </table>
+          
+            <button onclick="window.location.href = 'produccionGalleta';">¿Quieres hacer galletas?</button>
             <h2>SE ESTA TERMINANDO :</h2>
             <table class="table table-bordered">
                 <tr>
@@ -122,8 +124,9 @@
         
     </script>
     <div class="row">
-        <div class="col-6">
-            <h2 class="titulos" >Materia Prima</h2>
+        <h2 class="titulos"> Inventario</h2>
+        <div class="col-6 mt-3">
+            <h4 class="titulos">Materia Prima</h4>
             <table class="table table-bordered">
                 <tr  >
                     <th>Nombre</th>
@@ -143,46 +146,15 @@
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             <input type="hidden" name="accion" value="descuentar_producto">
                             <input type="hidden" name="id_materiaPrima" value="{{mp.id_materiaPrima}}">  <!-- Cambia este campo al nombre correcto -->
-                            <button type="submit" class="btn btn-primary">Descuentar Galleta</button>
+                            <button type="submit" class="btn btn-primary">Descontar producto</button>
                         </form>
                     </td>
                 </tr>
                 {% endfor %}
             </table>
-        </div>
 
-        <div class="col-6">
-            <h2 class="titulos">Galletas</h2>
-            <table class="table table-bordered">
-                <tr>
-                    <th>Nombre</th>
-                    <th>Cantidad</th>
-                    <th>Caducidad</th>
-                    <th>Mandar a merma</th>
-                </tr>
-                {% for g in galleta %}
-                <tr>
-                    <td>{{ g.nombre }}</td>
-                    <td>{{ g.cantidad }}</td>
-                    <td>{{ g.caducidad }}</td>
-                    <td>
-                        <form action="/inventario" method="POST">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <input type="hidden" name="accion" value="descuentar_galleta">
-                            <input type="hidden" name="galleta_id" value="{{ g.id_galleta }}">  <!-- Cambia este campo al nombre correcto -->
-                            <button type="submit" class="btn btn-primary">Descuentar Galleta</button>
-                        </form>
-                    </td>                      
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-    </div>
-
-    <!-- Tabla para mostrar las materias primas a punto de caducar -->
-    <div class="row">
-        <div class="col-12">
-            <h2 class="titulos" style="background-color: #a90909;" ><i class="fas fa-clock"></i>Materias Primas a Punto de Caducar</h2>
+            <!-- Tabla para mostrar las materias primas a punto de caducar -->
+            <h4 class="titulos" style="color: #a90909;" ><i class="fas fa-clock"></i> Materias Primas a Punto de Caducar</h4>
             <table class="table table-bordered" style="background-color: #a90909;">
                 <tr>
                     <th>Nombre</th>
@@ -202,16 +174,38 @@
                 {% endfor %}
             </table>
         </div>
-    </div>
-    <style>
-        .bg-light-red {
-            background-color: #ae2a2a; /* Cambiar al tono de rojo deseado */
-        }
-    </style>
-    <!-- Tabla para mostrar las galletas a punto de caducar -->
+         
+
+        <div class="col-6 mt-3">
+            <h4 class="titulos">Galletas</h4>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Caducidad</th>
+                    <th>Mandar a merma</th>
+                </tr>
+                {% for g in galleta %}
+                <tr>
+                    <td>{{ g.nombre }}</td>
+                    <td>{{ g.cantidad }}</td>
+                    <td>{{ g.caducidad }}</td>
+                    <td>
+                        <form action="/inventario" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <input type="hidden" name="accion" value="descuentar_galleta">
+                            <input type="hidden" name="galleta_id" value="{{ g.id_galleta }}">  <!-- Cambia este campo al nombre correcto -->
+                            <button type="submit" class="btn btn-primary">Descontar Galleta</button>
+                        </form>
+                    </td>                      
+                </tr>
+                {% endfor %}
+            </table>
+
+            <!-- Tabla para mostrar las galletas a punto de caducar -->
     <div class="row">
         <div class="col-12">
-            <h2 class="titulos" style="background-color: #a90909;"><i class="fas fa-clock"></i> Galletas a Punto de Caducar</h2>
+            <h4 class="titulos" style="color: #a90909;"><i class="fas fa-clock"></i> Galletas a Punto de Caducar</h4>
             <table class="table table-bordered">
                 <tr>
                     <th>Nombre</th>
@@ -239,6 +233,69 @@
             </table>
         </div>
     </div>
+        </div>
+    </div>
+
+    <!-- Tabla para mostrar las materias primas a punto de caducar -->
+<!--     <div class="row">
+        <div class="col-12">
+            <h4 class="titulos" style="background-color: #a90909;" ><i class="fas fa-clock"></i>Materias Primas a Punto de Caducar</h4>
+            <table class="table table-bordered" style="background-color: #a90909;">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Medida</th>
+                    <th>Caducidad</th>
+                </tr>
+                {% for mp in productos_a_caducarg %}
+                <tr >
+                    <td>{{mp.materia_prima.nombre }}</td>
+                    
+                    <td>{{ mp.cantidad }}</td>
+                    <td>{{ mp.materia_prima.tipomedidasmaterialprimas_id_medida }}</td>
+                    <td>{{ mp.caducidad }}</td>
+                     
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div> -->
+    <style>
+        .bg-light-red {
+            background-color: #ae2a2a; /* Cambiar al tono de rojo deseado */
+        }
+    </style>
+    <!-- Tabla para mostrar las galletas a punto de caducar -->
+    <!-- <div class="row">
+        <div class="col-12">
+            <h4 class="titulos" style="background-color: #a90909;"><i class="fas fa-clock"></i> Galletas a Punto de Caducar</h4>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Caducidad</th>
+                    <th>Mandar a Merma</th>
+                </tr>
+                {% for g in productos_a_caducar %}
+                <tr >
+                    <td>{{ g.galleta.nombre}}</td>
+                    <td>{{ g.cantidad }}</td>
+                    <td>{{ g.caducidad }}</td>
+                    <td>
+
+                        <form action="/inventario" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <input type="hidden" name="accion" value="mermagalletacasi">
+                            <input type="hidden" name="detalle_id" value="{{g.id_detalle_galleta}}">
+                            <button type="submit" class="btn btn-danger">Mandar a Merma</button>
+                        </form>
+                    </td>
+                    
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div> -->
 </div>
  
 {% endblock %}

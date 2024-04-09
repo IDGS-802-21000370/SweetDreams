@@ -42,7 +42,7 @@
   left: 0;
   width: 250px;
   height: 100%;
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(192, 161, 116);
   transition: transform 0.3s ease;
   transform: translateX(-100%);
   overflow-y: auto;
@@ -161,4 +161,19 @@
   transform: translate(-50%, -50%);
   background-color: white;
   z-index: 1;
+}
+
+
+.product-btn {
+  display: block;
+  width: 200px;
+  margin: 10px auto;
+  padding: 10px;
+  background-color: #1c771f;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
 }

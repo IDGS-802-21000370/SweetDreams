@@ -3,37 +3,35 @@
 {% block content %}
 <div class="container">
     <style>
-        /* Estilos para el modal */
         .modal {
-            display: none; /* Por defecto, oculto */
-            position: fixed; /* Posición fija */
-            z-index: 1; /* Por encima de todo */
+            display: none;
+            position: fixed;
+            z-index: 1;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto; /* Permite desplazamiento */
-            background-color: rgb(0,0,0); /* Fondo negro semitransparente */
-            background-color: rgba(0,0,0,0.4); /* Fondo negro semitransparente */
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
         }
-    
-        /* Estilos para el contenido del modal */
+   
+       
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto; /* Margen superior e inferior para centrar verticalmente */
+            margin: 15% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 80%; /* Ancho del contenido del modal */
+            width: 80%;
         }
-    
-        /* Estilos para el botón de cerrar el modal */
+   
         .close {
             color: #aaa;
             float: right;
             font-size: 28px;
             font-weight: bold;
         }
-    
+   
         .close:hover,
         .close:focus {
             color: black;
@@ -41,53 +39,51 @@
             cursor: pointer;
         }
     </style>
-    </head> 
+    </head>
     <body>
-    
-        <!-- Modal -->
+   
         <div id="myModal" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
-                <!-- Contenido del modal -->
-                <h2>Productos a Punto de Caducar ¡URGENTE UTILIZAR!</h2>
-                <h3>Galletas por caducar:</h3>
+                <h2>¡URGENTE SE ESTAN TERMINANDO!</h2>
+                <h3>Galletas por terminar :</h3>
                 {% for producto in galletasc %}
                 {{ producto.nombre}}<br>
                 {% endfor %}
                 <button id="hacerMasGalletas">Hacer más galletas</button>
             </div>
         </div>
-    
-        <!-- Script JavaScript para mostrar el modal automáticamente -->
+   
         <script>
-            // Función para abrir el modal automáticamente al cargar la página
-            window.onload = function() {
-                document.getElementById("myModal").style.display = "block";
-            };
-    
-            // Seleccionar el modal, el botón para cerrarlo y el botón "Hacer más galletas"
+            // Función para verificar si el modal ya se mostró antes
+            function checkModal() {
+                if (!localStorage.getItem('modalShown')) {
+                    var modal = document.getElementById("myModal");
+                    modal.style.display = "block";
+                    localStorage.setItem('modalShown', 'true');
+                }
+            }
+   
+            window.onload = checkModal;
+   
             var modal = document.getElementById("myModal");
             var span = document.getElementsByClassName("close")[0];
             var hacerMasGalletasButton = document.getElementById("hacerMasGalletas");
-    
-            // Cuando el usuario haga clic en <span> (x), cerrar el modal
+   
             span.onclick = function() {
-                modal.style.display = "none"; // Ocultar el modal
+                modal.style.display = "none";
             }
-    
-            // Cuando el usuario haga clic en el botón "Hacer más galletas", redireccionar a produccionGalleta.html
+   
             hacerMasGalletasButton.onclick = function() {
                 window.location.href = "/produccionGalleta";
             }
-    
-            // Cuando el usuario haga clic en cualquier lugar fuera del modal, cerrarlo
+   
             window.onclick = function(event) {
                 if (event.target == modal) {
-                    modal.style.display = "none"; // Ocultar el modal
+                    modal.style.display = "none";
                 }
             }
         </script>
-  
     <form name="venta" action="/ventas" id="venta" method="POST">
         <div id="boton-container">
             <input type="button" onclick="openModalCaja()" id="imprimir" class="btn btn-success" name="imprimir" value="Abrir caja"/>
@@ -107,8 +103,8 @@
                     <hr>
                 {% endfor %}
                 <li></li>
-                <li><input type="button"  onclick="openModalVenta()" class="btn btn-success" value="Realizar venta"/></li>
-                <li><input type="button" onclick="openModalVentaImpresion()" id="imprimir" class="btn btn-success" name="imprimir" value="Realizar venta e imprimir     "/></li>
+                <input type="button"  onclick="openModalVenta()" class="btn btn-success product-btn" value="Realizar venta"/>
+                <input type="button" onclick="openModalVentaImpresion()" id="imprimir" class="btn btn-success product-btn" name="imprimir" value="Realizar venta e imprimir"/>
             </ul>
         </div>
 

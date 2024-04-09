@@ -4,94 +4,87 @@
 <div class="container">
     <form name="receta" action="/recetas" id="receta" method="POST">
         <div class="row">
-            <h2 class="titulos">Receta</h2>
+            <h2 class="titulos">Recetas</h2>
         </div>
-        <div class="row">
-        <div class="col-md-1 mt-2">
-            {{ input_Form(formReceta.id_receta, class="form-control", disabled=True) }}
-            <input type="hidden" name="id_receta" value="{{ formReceta.id_receta.data }}">
+        
+        <div class="row mt-3">
+            <div class="col-1" style="margin-top: 32px;">
+                {{ input_Form(formReceta.id_receta, class="form-control", disabled=True) }}
+                <input type="hidden" name="id_receta" value="{{ formReceta.id_receta.data }}">
+            </div>
+            <div class="col-4">
+                    <h4 class="titulos">Agregar nueva receta</h4>
+                <div class="col mt-2">
+                    {{input_Form(formReceta.nombreReceta, class="form-control")}} 
+                    {{input_Form(formReceta.cantidad, class="form-control", type="number")}}
+                        <label for="materiasPrimas" class="form-label">Selecciona la materia prima:</label>
+                        <select id="carmateriasPrimass" name="materiasPrimas" class="form-select">
+                            {% for mp in materiasPrimas %}
+                                <option value="{{ mp.id_materiaPrima }}">{{ mp.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="tipoMedidaMateriaPrima" class="form-label">Selecciona el tipo de medida:</label>
+                        <select id="tipoMedidaMateriaPrima" name="tipoMedidaMateriaPrima" class="form-select">
+                            {% for tmp in tipoMedidaMateriaPrima %}
+                                <option value="{{ tmp.id_medida }}">{{ tmp.descripcion }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="submit" id="registrar" class="btn btn-dark mt-3" name="registrar" value="Registrar"/>
+                        <div class="row">
+                            {{input_Form(formReceta.totalGalletas, class="form-control", type="number")}}
+                            {{input_Form(formReceta.descripcion, class="form-control")}}
+                        </div>
+                </div>
+            </div>
+            <div class="col" style="margin-top: 50px;">
+                <h4 class="titulos">Ingredientes de la receta</h4>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Ingredientes</th>
+                        <th>Cantidad</th>
+                        <th>Tipo de medida</th>
+                        <th>Eliminar</th>
+                    </tr>
+                    {% for r in receta %}
+                    <tr>
+                        <td>{{ r['ingrediente'] }}</td>
+                        <td>{{ r['cantidad'] }}</td>
+                        <td>{{ r['tipoMedida'] }}</td>
+                        <td><input type="submit" id="eliminar" class="btn btn-danger" name="eliminar" value="{{ r['id_catReceta'] }}"/> </td>                        
+                    </tr>
+                    {% endfor %}
+                </table>
+                <div class="col mt-3 mb-3 mt-5">  
+                    <h4 class="titulos">Recetas existentes</h4>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripcion</th>
+                            <th>Modificar</th>
+                        </tr>
+                        {% for rc in recetasCargadas %}
+                        <tr>
+                            <td>{{ rc.nombre }}</td>
+                            <td>{{ rc.descripcion }}</td>
+                            <td><input type="submit" id="obtenerModificar" class="btn btn-info" name="obtenerModificar" value="{{ rc.id_receta }}"/> </td>                        
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
         </div>
-        <div class="col mt-2">
-            {{input_Form(formReceta.nombreReceta, class="form-control")}} 
-        </div>
-        <div class="col mt-2">
-            {{input_Form(formReceta.cantidad, class="form-control", type="number")}}
-        </div>
-        <div class="col">
-            <label for="materiasPrimas" class="form-label">Selecciona la materia prima:</label>
-            <select id="carmateriasPrimass" name="materiasPrimas" class="form-select">
-                {% for mp in materiasPrimas %}
-                    <option value="{{ mp.id_materiaPrima }}">{{ mp.nombre }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col">
-            <label for="tipoMedidaMateriaPrima" class="form-label">Selecciona el tipo de medida:</label>
-            <select id="tipoMedidaMateriaPrima" name="tipoMedidaMateriaPrima" class="form-select">
-                {% for tmp in tipoMedidaMateriaPrima %}
-                    <option value="{{ tmp.id_medida }}">{{ tmp.descripcion }}</option>
-                {% endfor %}
-            </select>
-        </div>
-    </div>
-    <div class="row mt-3">
-        <div class="col">
-            <input type="submit" id="registrar" class="btn btn-dark" name="registrar" value="Registrar"/>
-        </div>
-    </div>
-    <div class="col mt-3 mb-3">  
-        <table class="table table-bordered">
-            <tr>
-                <th>Ingredientes</th>
-                <th>Cantidad</th>
-                <th>Tipo de medida</th>
-                <th>Eliminar</th>
-            </tr>
-            {% for r in receta %}
-            <tr>
-                <td>{{ r['ingrediente'] }}</td>
-                <td>{{ r['cantidad'] }}</td>
-                <td>{{ r['tipoMedida'] }}</td>
-                <td><input type="submit" id="eliminar" class="btn btn-danger" name="eliminar" value="{{ r['id_catReceta'] }}"/> </td>                        
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
     <div id="myModal" style="display: none; border: 1px solid black; padding: 20px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; z-index: 1;">
         <span onclick="closeModal('myModal')" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
         <h2>¿Quieres agregar esta receta?</h2>
         <input type="submit" id="insertar" class="btn btn-success" name="insertar" value="Confirmar"/>
         <input type="button"  onclick="closeModal('myModal')" class="btn btn-danger" value="Cancelar"/>
     </div>
-    <div class="row">
-        <div class="col-md-5">
-            {{input_Form(formReceta.descripcion, class="form-control")}}
+    <div class="row mt-3" style="margin-left: 124px;">
+        <div class="col-md-4">
             <input type="hidden" name="csrf_token" value="{{csrf_token()}}"/>
             <input type="button"  onclick="openModal()" class="btn btn-success" value="Insertar receta"/>
             <input type="submit" id="cargar" class="btn btn-primary" name="cargar" value="Cargar recetas"/>
-            <input type="submit" id="actualizar" class="btn btn-warning" name="actualizar" value="Actualizar venta"/>
-            <input type="submit" id="limpiar" class="btn btn-danger" name="limpiar" value="Limpiar formulario"/> 
-        </div>
-        <div class="col-md-2">
-            {{input_Form(formReceta.totalGalletas, class="form-control", type="number")}}
-        </div>
-        <div class="col">
-            <div class="col mt-3 mb-3">  
-                <table class="table table-bordered">
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Descripcion</th>
-                        <th>Modificar</th>
-                    </tr>
-                    {% for rc in recetasCargadas %}
-                    <tr>
-                        <td>{{ rc.nombre }}</td>
-                        <td>{{ rc.descripcion }}</td>
-                        <td><input type="submit" id="obtenerModificar" class="btn btn-info" name="obtenerModificar" value="{{ rc.id_receta }}"/> </td>                        
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
+            <input type="submit" id="actualizar" class="btn btn-warning" name="actualizar" value="Actualizar receta"/>
         </div>
     </div>
     {% if mostrar_modal %}

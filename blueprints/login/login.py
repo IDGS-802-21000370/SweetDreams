@@ -28,7 +28,7 @@ def login():
                 return 'El usuario no está activado'
         else:
             return 'Usuario o contraseña inválidos'
-    return render_template('login/login.html', formLogin=formLogin)
+    return render_template('ventas/ventas.html', formLogin=formLogin)
 
 @login_blueprint.route('/logout')
 @login_required
