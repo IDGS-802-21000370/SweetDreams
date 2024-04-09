@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request
-from datetime import date, datetime
+from datetime import datetime, timedelta
+from sqlalchemy import extract
 from blueprints.models import DetalleVentas, Galleta, TipoVenta, Venta, db
 from sqlalchemy import func
 import matplotlib.pyplot as plt
@@ -16,11 +17,14 @@ def dashboard():
 
 def calcular_ventas_diarias():
     fecha_actual = datetime.now().date()
+    primer_dia_mes = fecha_actual.replace(day=1)
+    ultimo_dia_mes = primer_dia_mes.replace(month=primer_dia_mes.month % 12 + 1, day=1) - timedelta(days=1)
+    
     ventas_diarias = db.session.query(
         func.date(Venta.fecha_creacion).label('fecha'),
         func.sum(Venta.total).label('total')
     ).filter(
-        func.date(Venta.fecha_creacion) == fecha_actual
+        Venta.fecha_creacion.between(primer_dia_mes, ultimo_dia_mes)
     ).group_by(
         func.date(Venta.fecha_creacion)
     ).all()
@@ -95,22 +99,26 @@ def generar_grafico_ventas_diarias(ventas_diarias):
         ventas_por_tipo[galleta_id][tipo_venta_nombre] = cantidad
 
     nombres_galletas = [Galleta.query.get(id_galleta).nombre for id_galleta in ventas_por_tipo.keys()]
-    piezas = [ventas.get('Pieza', 0) for ventas in ventas_por_tipo.values()]
-    cajas = [ventas.get('Caja', 0) for ventas in ventas_por_tipo.values()]
-    granajes = [ventas.get('Granaje', 0) for ventas in ventas_por_tipo.values()]
+    
+    ventas_por_tipo_list = [ventas_por_tipo.get(galleta_id, {}) for galleta_id in ventas_por_tipo.keys()]
+    ventas_por_tipo_list = [{'caja': venta.get('caja', 0), 'pieza': venta.get('pieza', 0), 'gramaje': venta.get('gramaje', 0)} for venta in ventas_por_tipo_list]
+
+    ventas_por_caja = [venta['caja'] for venta in ventas_por_tipo_list]
+    ventas_por_pieza = [venta['pieza'] for venta in ventas_por_tipo_list]
+    ventas_por_gramaje = [venta['gramaje'] for venta in ventas_por_tipo_list]
 
     plt.figure(figsize=(10, 6))
     bar_width = 0.35
     indices = range(len(nombres_galletas))
-    
-    plt.bar(indices, piezas, bar_width, label='Pieza')
-    plt.bar(indices, cajas, bar_width, bottom=piezas, label='Caja')
-    plt.bar(indices, granajes, bar_width, bottom=[i+j for i,j in zip(piezas, cajas)], label='Granaje')
+
+    plt.bar(indices, ventas_por_caja, bar_width, label='Caja')
+    plt.bar([i + bar_width for i in indices], ventas_por_pieza, bar_width, label='Pieza')
+    plt.bar([i + bar_width * 2 for i in indices], ventas_por_gramaje, bar_width, label='Gramaje')
     
     plt.xlabel('Galleta')
     plt.ylabel('Cantidad Vendida')
     plt.title('Ventas por Tipo de Galleta')
-    plt.xticks(indices, nombres_galletas, rotation=45)
+    plt.xticks([i + bar_width for i in indices], nombres_galletas, rotation=45)
     plt.legend()
     plt.tight_layout()
 
