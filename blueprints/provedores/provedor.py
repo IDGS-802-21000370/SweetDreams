@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request, url_for
 from blueprints.models import Proveedor, db
-from blueprints.provedores import proveedor
+from blueprints.provedores import provedor
 import blueprints.forms as forms
 
 proveedor_blueprint = Blueprint("provedores", __name__, template_folder="templates")
@@ -12,7 +12,11 @@ def proveedorIndex():
     if request.method == "POST":
         if 'buttonP' in request.form:
             #Alerta para eliminar
-            proveedor.eliminarP()
+            id = request.form['buttonP']
+            prvd=db.session.query(Proveedor).filter(Proveedor.id_proveedor==id).first()
+            prvd.estatus = 0
+            db.session.add(prvd)
+            db.session.commit()
             return redirect(url_for('provedores.proveedorIndex'))
         
     return render_template("proveedor/proveedor.html", Proveedor=proveedores)
@@ -24,7 +28,10 @@ def prooveedorForm():
     if request.method=="POST":
         if request.form['btnPrv'] == "btnRegistrarPrv":
             #Alerta para registrar
-            proveedor.indexP()
+            prvd_form=forms.ProveedorForm(request.form)
+            prvd=Proveedor(nombreEmpresa=prvd_form.nombreEmpresa.data, direccion = prvd_form.direccion.data, contacto = prvd_form.contacto.data)
+            db.session.add(prvd)
+            db.session.commit()
             return redirect(url_for('provedores.proveedorIndex'))
             
     return render_template("proveedor/proveedorForm.html", formProveedor=prvdForm)
@@ -50,3 +57,19 @@ def prooveedorUpdate():
         db.session.commit()
         return redirect(url_for('provedores.proveedorIndex'))
     return render_template("proveedor/proveedorM.html", formProveedor=prvdForm)
+
+@proveedor_blueprint.route("/proveedorE", methods=["GET", "POST"])
+def proveedorEliminado():
+    proveedores = Proveedor.query.filter_by(estatus=0).all()
+    
+    if request.method == "POST":
+        if 'buttonP' in request.form:
+            #Alerta para restaurar
+            id = request.form['buttonP']
+            prvd=db.session.query(Proveedor).filter(Proveedor.id_proveedor==id).first()
+            prvd.estatus = 1
+            db.session.add(prvd)
+            db.session.commit()
+            return redirect(url_for('provedores.proveedorEliminado'))
+        
+    return render_template("proveedor/proveedorE.html", Proveedor=proveedores)

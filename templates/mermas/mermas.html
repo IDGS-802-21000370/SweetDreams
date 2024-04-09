@@ -10,13 +10,19 @@
                     <tr>
                         <th>Producto</th>
                         <th>Fecha</th>
+                        <th>Tipo de Mermado</th>
+                        <th>Cantidad</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        
-                    </tr>
-                    
+                    {% for merma in mermas_tipo_1 %}
+                        <tr>
+                            <td>{{ merma.nombre }}</td>
+                            <td>{{ merma.caducidad }}</td>
+                            <td>{{  merma.tipo_merma.descripcion }}</td>
+                            <td>{{ merma.cantidad }}</td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -27,14 +33,19 @@
                     <tr>
                         <th>Galleta</th>
                         <th>Fecha</th>
+                        <th>Tipo de Mermado</th>
+                        <th>Cantidad</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                      
-                    </tr>
-                    
-                   
+                    {% for merma in mermas_tipo_2 %}
+                        <tr>
+                            <td>{{ merma.nombre }}</td>
+                            <td>{{ merma.caducidad }}</td>
+                            <td>{{ merma.tipo_merma.descripcion }}</td>
+                            <td>{{ merma.cantidad }}</td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

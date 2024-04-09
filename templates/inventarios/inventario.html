@@ -2,24 +2,150 @@
 {% from "_macros.html" import input_Form %}
 {% block content %}
 <div class="container">
-    <div class="row">
-        <div class="col-6">
-            <h2 class="titulos">Materia Prima</h2>
+    <style>
+        /* Estilos para el modal */
+        .modal {
+            display: none; /* Por defecto, oculto */
+            position: fixed; /* Posición fija */
+            z-index: 1; /* Por encima de todo */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* Permite desplazamiento */
+            background-color: rgb(0,0,0); /* Fondo negro semitransparente */
+            background-color: rgba(0,0,0,0.4); /* Fondo negro semitransparente */
+        }
+
+        /* Estilos para el contenido del modal */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* Margen superior e inferior para centrar verticalmente */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Ancho del contenido del modal */
+        }
+
+        /* Estilos para el botón de cerrar el modal */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head> 
+<body>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <!-- Contenido del modal -->
+            <h2>Productos a Punto de Caducar ¡URGENTE UTILIZAR!</h2>
             <table class="table table-bordered">
                 <tr>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Caducidad</th>
+                </tr>
+                {% for producto in productos_a_caducar %}
+                <tr>
+                    <td>{{ producto.galleta.nombre }}</td>
+                    <td>{{ producto.cantidad }}</td>
+                    <td>{{ producto.caducidad }}</td>
+                </tr>
+                {% endfor %}
+                {% for productos in productos_a_caducarg %}
+                <tr>
+                    <td>{{ productos.materia_prima.nombre }}</td>
+                    <td>{{ productos.cantidad }}</td>
+                    <td>{{ productos.caducidad }}</td>
+                </tr>
+                <button onclick="window.location.href = 'produccionGalleta';">¿Quieres hacer galletas?</button>
+            </div>
+                {% endfor %}
+            </table>
+            <h2>SE ESTA TERMINANDO :</h2>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                </tr>
+                
+                {% for productos in materia_prima_hacer %}
+                <tr>
+                    <td>{{ productos.nombre }}</td>
+                    <td>{{ productos.cantidad }}</td>
+                   
+                </tr>
+               
+            </div>
+                {% endfor %}
+            </table>
+            <button onclick="window.location.href = 'compra';">¿Quieres comprar inventario?</button>
+        </div>
+    </div>
+ 
+    <!-- Script JavaScript para mostrar el modal automáticamente -->
+    <script>
+        // Función para abrir el modal automáticamente al cargar la página
+        window.onload = function() {
+            document.getElementById("myModal").style.display = "block";
+        };
+
+        // Seleccionar el modal y el botón para cerrarlo
+        var modal = document.getElementById("myModal");
+        var span = document.getElementsByClassName("close")[0];
+
+        // Cuando el usuario haga clic en <span> (x), cerrar el modal
+        span.onclick = function() {
+            modal.style.display = "none"; // Ocultar el modal
+        }
+
+        // Cuando el usuario haga clic en cualquier lugar fuera del modal, cerrarlo
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none"; // Ocultar el modal
+            }
+        }
+        
+
+
+        
+    </script>
+    <div class="row">
+        <div class="col-6">
+            <h2 class="titulos" >Materia Prima</h2>
+            <table class="table table-bordered">
+                <tr  >
                     <th>Nombre</th>
                     <th>Cantidad</th>
                     <th>Tipo de medida</th>
                     <th>Caducidad</th>
                     <th>Mandar a merma</th>
                 </tr>
-                {% for mp in materiasPrimas %}
+                {% for mp in materia_prima %}
                 <tr>
                     <td>{{ mp.nombre }}</td>
                     <td>{{ mp.cantidad }}</td>
                     <td>{{ mp.tipomedidasmaterialprimas_id_medida }}</td>
                     <td>{{ mp.caducidad }}</td>
-                    <td><input type="submit" id="mandarMerma" class="btn btn-danger" name="mandarMerma" value="{{ mp.id_materiaPrima }}"/> </td>                        
+                    <td>
+                        <form action="/inventario" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <input type="hidden" name="accion" value="descuentar_producto">
+                            <input type="hidden" name="id_materiaPrima" value="{{mp.id_materiaPrima}}">  <!-- Cambia este campo al nombre correcto -->
+                            <button type="submit" class="btn btn-primary">Descuentar Galleta</button>
+                        </form>
+                    </td>
                 </tr>
                 {% endfor %}
             </table>
@@ -34,16 +160,85 @@
                     <th>Caducidad</th>
                     <th>Mandar a merma</th>
                 </tr>
-                {% for g in galletas %}
+                {% for g in galleta %}
                 <tr>
                     <td>{{ g.nombre }}</td>
                     <td>{{ g.cantidad }}</td>
                     <td>{{ g.caducidad }}</td>
-                    <td><input type="submit" id="mandarMerma" class="btn btn-danger" name="mandarMerma" value="{{ g.id_galleta }}"/> </td>                        
+                    <td>
+                        <form action="/inventario" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <input type="hidden" name="accion" value="descuentar_galleta">
+                            <input type="hidden" name="galleta_id" value="{{ g.id_galleta }}">  <!-- Cambia este campo al nombre correcto -->
+                            <button type="submit" class="btn btn-primary">Descuentar Galleta</button>
+                        </form>
+                    </td>                      
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <!-- Tabla para mostrar las materias primas a punto de caducar -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="titulos" style="background-color: #a90909;" ><i class="fas fa-clock"></i>Materias Primas a Punto de Caducar</h2>
+            <table class="table table-bordered" style="background-color: #a90909;">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Medida</th>
+                    <th>Caducidad</th>
+                </tr>
+                {% for mp in productos_a_caducarg %}
+                <tr >
+                    <td>{{mp.materia_prima.nombre }}</td>
+                    
+                    <td>{{ mp.cantidad }}</td>
+                    <td>{{ mp.materia_prima.tipomedidasmaterialprimas_id_medida }}</td>
+                    <td>{{ mp.caducidad }}</td>
+                     
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <style>
+        .bg-light-red {
+            background-color: #ae2a2a; /* Cambiar al tono de rojo deseado */
+        }
+    </style>
+    <!-- Tabla para mostrar las galletas a punto de caducar -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="titulos" style="background-color: #a90909;"><i class="fas fa-clock"></i> Galletas a Punto de Caducar</h2>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Caducidad</th>
+                    <th>Mandar a Merma</th>
+                </tr>
+                {% for g in productos_a_caducar %}
+                <tr >
+                    <td>{{ g.galleta.nombre}}</td>
+                    <td>{{ g.cantidad }}</td>
+                    <td>{{ g.caducidad }}</td>
+                    <td>
+
+                        <form action="/inventario" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <input type="hidden" name="accion" value="mermagalletacasi">
+                            <input type="hidden" name="detalle_id" value="{{g.id_detalle_galleta}}">
+                            <button type="submit" class="btn btn-danger">Mandar a Merma</button>
+                        </form>
+                    </td>
+                    
                 </tr>
                 {% endfor %}
             </table>
         </div>
     </div>
 </div>
+ 
 {% endblock %}
