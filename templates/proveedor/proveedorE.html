@@ -6,14 +6,11 @@
 <div class="container">
     <div class="row">
         <div class="row">
-            <div class="col-8">
-                <h2 class="titulos">Proveedor</h2>
+            <div class="col-10">
+                <h2 class="titulos">Proveedores Eliminados</h2>
             </div>
             <div class="col-2">
-                <a href="/proveedoresForm" class="btn btn-success">Nuevo Proveedor</a>
-            </div>
-            <div class="col-2">
-                <a href="/proveedorE" class="btn btn-primary">Proveedores Eliminados</a>
+                <a href="/proveedores" class="btn btn-primary">Regresar</a>
             </div>
         </div>
         <table class="table table-striped table-bordered mt-4">
@@ -23,7 +20,6 @@
                     <th>Direccion</th>
                     <th>Contacto</th>
                     <th></th>
-                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -32,8 +28,7 @@
                     <td>{{prvd.nombreEmpresa}}</td>
                     <td>{{prvd.direccion}}</td>
                     <td>{{prvd.contacto}}</td>
-                    <td><button class="btn btn-danger" name="buttonP" value="{{prvd.id_proveedor}}" id="btnEliminarP">Eliminar</button></td>
-                    <td><a href="/proveedoresUpdate?id={{prvd.id_proveedor}}" class="btn btn-warning">Modificar</a></td>
+                    <td><button class="btn btn-warning" name="buttonP" value="{{prvd.id_proveedor}}" id="btnRestaurarP">Restaurar</button></td>
                 </tr>
                 {%endfor%}
             </tbody>

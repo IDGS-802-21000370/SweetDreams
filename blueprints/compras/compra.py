@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request
 import blueprints.forms as forms
-from blueprints.models import Compra, DetalleCompra, db
+from blueprints.models import Compra, DetalleCompra, Caja, CajaRetiro, DetalleMateriaPrima, MateriasPrimas, db
+from datetime import datetime
+from flask_login import current_user
 
 compra_blueprint = Blueprint("compras", __name__, template_folder="templates")
 
@@ -55,33 +57,70 @@ def compraForm():
             indexEliminar = request.form.getlist('eliminar[]')
             indexEliminar = [int(index) for index in indexEliminar]
             MPrima = [materiap for i, materiap in enumerate(MPrima, 1) if i not in indexEliminar]
-        
+            MPrimaTexto = [materiav for i, materiav in enumerate(MPrimaTexto, 1) if i not in indexEliminar]
+
         if request.form['buttonMP'] == "btnLimpiarMP":
             MPrima.clear()
-
-        #Alerta para Registrar
-        if request.form['buttonMP'] == "btnRegistrarMP":
-            #tabla compra
-            prvd=Compra(totalCompra=crpForm.totalCompra.data, fecha_actualiza = crpForm.fecha_actualiza.data, usuario_id_usuario = 1)
-                #Cambiar id_usuario por id del usuario loggeado
-            db.session.add(prvd)
-            db.session.commit()
-            
-            #tabla detalle compra
-            idCompra = db.session.query(db.func.max(Compra.id_compra)).scalar()
-            for elemento in MPrima:
-                cantidad = elemento['cantidad']
-                tipoMP_id = elemento['tipoMP']
-                materiaprima_id = elemento['materiaprima']
-                prvd_id = elemento['prvd']
-        
-                detalle = DetalleCompra(cantidad=cantidad, tipomedidasmaterialprimas_id_medida=tipoMP_id, 
-                                        compra_id_compra=idCompra, materiasprimas_id_materiaPrima=materiaprima_id, 
-                                        proveedor_id_proveedor=prvd_id)
-        
-                db.session.add(detalle)
-                db.session.commit()
-            MPrima.clear()
             MPrimaTexto.clear()
+
+        #Alerta para Registrar        
+        if request.form['buttonMP'] == "btnRegistrarMP":
+
+            if not MPrima:
+                print("Ingrese materias primas a registrar")
+            #Alert
+            else:
+                cajaA=db.session.query(Caja).filter(Caja.id_caja==1).first()
+                if cajaA.dineroTotal < int(crpForm.totalCompra.data):
+                    print("No hay suficiente dinero en caja")
+                else:                    
+                    #tabla compra
+                    #uid = current_user.id_usuario
+                    #prvd=Compra(totalCompra=crpForm.totalCompra.data, fecha_actualiza = datetime.now(), usuario_id_usuario = uid)
+                    prvd=Compra(totalCompra=crpForm.totalCompra.data, fecha_actualiza = datetime.now(), usuario_id_usuario = 1)
+                    #Cambiar id_usuario por id del usuario loggeado
+                    db.session.add(prvd)
+                    db.session.commit()
+                    idCompra = db.session.query(db.func.max(Compra.id_compra)).scalar()
+
+                    #tabla caja_retiro
+                    detalle = CajaRetiro(descripcion=crpForm.descripcion.data, dineroSacado=crpForm.totalCompra.data, caja_id_caja=1, compra_id_compra=idCompra)
+                    db.session.add(detalle)
+                    db.session.commit()
+
+                    #restar de caja
+                    cajaA.dineroTotal = (cajaA.dineroTotal - int(crpForm.totalCompra.data))
+                    #print(cajaA.dineroTotal - int(crpForm.totalCompra.data))
+                    db.session.add(cajaA)
+                    db.session.commit()
+                    
+                    #tabla detalle compra
+                    for elemento in MPrima:
+                        cantidad = elemento['cantidad']
+                        tipoMP_id = elemento['tipoMP']
+                        materiaprima_id = elemento['materiaprima']
+                        prvd_id = elemento['prvd']
+                
+                        detalle = DetalleCompra(cantidad=cantidad, tipomedidasmaterialprimas_id_medida=tipoMP_id, 
+                                                compra_id_compra=idCompra, materiasprimas_id_materiaPrima=materiaprima_id, 
+                                                proveedor_id_proveedor=prvd_id)
+                        db.session.add(detalle)
+                        db.session.commit()
+
+                        #registro detalle materia prima
+                        detalleMP = DetalleMateriaPrima(cantidad=cantidad, caducidad=datetime.now(), 
+                                                mermado=0, materia_prima_id=materiaprima_id, 
+                                                tipo_medida_id=tipoMP_id)
+                        db.session.add(detalleMP)
+                        db.session.commit()
+
+                        #suma a materia prima
+                        isrtMP=db.session.query(MateriasPrimas).filter(MateriasPrimas.id_materiaPrima==materiaprima_id).first()
+                        isrtMP.cantidad = (isrtMP.cantidad + int(cantidad))
+                        db.session.add(isrtMP)
+                        db.session.commit()
+                        
+                    MPrima.clear()
+                    MPrimaTexto.clear()
 
     return render_template("compra/compraForm.html", formCompra=crpForm, MPrima=MPrimaTexto)
