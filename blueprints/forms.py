@@ -44,13 +44,14 @@ class getProveedor(Form):
     
 class CompraForm(Form):
     #tabla compra
-    totalCompra = StringField("Total de la Compra", [validators.DataRequired(message="El campo es requerido"), validators.Length(min=1, max=100, message="Ingresa un valor valido")])
-    fecha_actualiza = DateField('Fecha de Registro', format='%Y-%m-%d')
+    totalCompra = IntegerField("Total de la Compra", [validators.DataRequired(message="El campo es requerido"), validators.number_range(min=1, max=100, message="Ingresa un valor valido")])
     #tabla detalle compra
-    cantidad =StringField("Cantidad", [validators.DataRequired(message="El campo es requerido"), validators.Length(min=1, max=100, message="Ingresa un valor valido")])
+    cantidad =IntegerField("Cantidad", [validators.DataRequired(message="El campo es requerido"),validators.number_range(min=1, max=1000, message="Ingresa un valor valido")])
     idTipoMedida = SelectField('Tipo de Medida', coerce=int)
     idMateriaPrima = SelectField('Materia Prima', coerce=int)
     idProveedor = SelectField('Proveedor', coerce=int)
+    #registro en caja retiro
+    descripcion = StringField("Descripcion", [validators.DataRequired(message="El campo es requerido"), validators.Length(min=1, max=1000, message="Ingresa un valor valido")])
    
     def __init__(self, *args, **kwargs):
         super(CompraForm, self).__init__(*args, **kwargs)
@@ -58,7 +59,7 @@ class CompraForm(Form):
         medidas = TipoMedidasMaterialPrimas.query.all()
         self.idTipoMedida.choices = [(medida.id_medida, medida.descripcion) for medida in medidas]
 
-        proveedores = Proveedor.query.all()
+        proveedores = Proveedor.query.filter_by(estatus=1).all()
         self.idProveedor.choices = [(proveedor.id_proveedor, proveedor.nombreEmpresa) for proveedor in proveedores]
 
         materias_primas = MateriasPrimas.query.all()
