@@ -3,6 +3,8 @@ from wtforms import StringField, TextAreaField, SelectField, RadioField, Integer
 from wtforms import validators
 from blueprints.models import MateriasPrimas, Proveedor, TipoMedidasMaterialPrimas
 from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SelectField
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp
 
 
 class LoginForm(FlaskForm):
@@ -44,13 +46,14 @@ class getProveedor(Form):
     
 class CompraForm(Form):
     #tabla compra
-    totalCompra = StringField("Total de la Compra", [validators.DataRequired(message="El campo es requerido"), validators.Length(min=1, max=100, message="Ingresa un valor valido")])
-    fecha_actualiza = DateField('Fecha de Registro', format='%Y-%m-%d')
+    totalCompra = IntegerField("Total de la Compra", [validators.DataRequired(message="El campo es requerido"), validators.number_range(min=1, max=10000000000000, message="Ingresa un valor valido")])
     #tabla detalle compra
-    cantidad =StringField("Cantidad", [validators.DataRequired(message="El campo es requerido"), validators.Length(min=1, max=100, message="Ingresa un valor valido")])
+    cantidad =IntegerField("Cantidad", [validators.DataRequired(message="El campo es requerido"),validators.number_range(min=1, max=100000, message="Ingresa un valor valido")])
     idTipoMedida = SelectField('Tipo de Medida', coerce=int)
     idMateriaPrima = SelectField('Materia Prima', coerce=int)
     idProveedor = SelectField('Proveedor', coerce=int)
+    #registro en caja retiro
+    descripcion = StringField("Descripcion", [validators.DataRequired(message="El campo es requerido"), validators.Length(min=1, max=1000, message="Ingresa un valor valido")])
    
     def __init__(self, *args, **kwargs):
         super(CompraForm, self).__init__(*args, **kwargs)
@@ -58,20 +61,26 @@ class CompraForm(Form):
         medidas = TipoMedidasMaterialPrimas.query.all()
         self.idTipoMedida.choices = [(medida.id_medida, medida.descripcion) for medida in medidas]
 
-        proveedores = Proveedor.query.all()
+        proveedores = Proveedor.query.filter_by(estatus=1).all()
         self.idProveedor.choices = [(proveedor.id_proveedor, proveedor.nombreEmpresa) for proveedor in proveedores]
 
         materias_primas = MateriasPrimas.query.all()
         self.idMateriaPrima.choices = [(materia.id_materiaPrima, materia.nombre) for materia in materias_primas]
-class UsuarioForm(Form):
+class UsuarioForm(FlaskForm):
     id_usuario=IntegerField("id")
     nombre = StringField("Nombre", [validators.DataRequired(message="el campo es requerido"), 
                          validators.Length(min=1, max=30, message="ingresa nombre valido")])
     nombreUsuario = StringField("Nombre de usuario", [validators.DataRequired(message="el campo es requerido"), 
                          validators.Length(min=1, max=30, message="ingresa usuario valido")])
-    contrasenia = StringField("Contraseña", [validators.DataRequired(message="el campo es requerido"), 
-                         validators.Length(min=1, max=30, message="ingresa contraseña valida")])
+    contrasenia = PasswordField("Contraseña", validators=[
+        DataRequired(message="El campo es requerido"),
+        Length(min=8, message='La contraseña debe tener al menos 8 caracteres'),
+        Regexp(r'[A-Z]', message='La contraseña debe contener al menos una letra mayúscula'),
+        Regexp(r'[a-z]', message='La contraseña debe contener al menos una letra minúscula'),
+        Regexp(r'\d', message='La contraseña debe contener al menos un número'),
+        Regexp(r'[!@#$%&*?]', message='La contraseña debe contener al menos un carácter especial')
+    ])
     puesto = StringField("Puesto", [validators.DataRequired(message="el campo es requerido"), 
                          validators.Length(min=1, max=30, message="ingresa puesto valido")])
-    rol = StringField("Rol", [validators.DataRequired(message="el campo es requerido"), 
-                         validators.Length(min=1, max=30, message="ingresa rol valido")])
+    roles = [("admin", "Admin"), ("usuario", "Usuario")]
+    rol = SelectField("Rol", choices=roles, validators=[validators.DataRequired(message="El campo es requerido")])

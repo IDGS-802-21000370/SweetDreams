@@ -15,7 +15,7 @@ class Usuario(db.Model, UserMixin):
     contrasenia = db.Column(db.String(100))
     puesto = db.Column(db.String(100))
     rol = db.Column(db.String(100))
-    estatus = db.Column(db.Integer)
+    estatus = db.Column(db.Integer, default=1)
     fecha_creacion = db.Column(db.DateTime, default=datetime.datetime.now)
     def get_id(self):
         return str(self.id_usuario)

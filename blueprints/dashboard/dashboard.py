@@ -4,6 +4,8 @@ from sqlalchemy import extract
 from blueprints.models import DetalleVentas, Galleta, TipoVenta, Venta, db
 from sqlalchemy import func
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 import io
 import base64
 
@@ -101,11 +103,10 @@ def generar_grafico_ventas_diarias(ventas_diarias):
     nombres_galletas = [Galleta.query.get(id_galleta).nombre for id_galleta in ventas_por_tipo.keys()]
     
     ventas_por_tipo_list = [ventas_por_tipo.get(galleta_id, {}) for galleta_id in ventas_por_tipo.keys()]
-    ventas_por_tipo_list = [{'caja': venta.get('caja', 0), 'pieza': venta.get('pieza', 0), 'gramaje': venta.get('gramaje', 0)} for venta in ventas_por_tipo_list]
+    ventas_por_tipo_list = [{'caja': venta.get('caja', 0), 'pieza': venta.get('pieza', 0)} for venta in ventas_por_tipo_list]
 
     ventas_por_caja = [venta['caja'] for venta in ventas_por_tipo_list]
     ventas_por_pieza = [venta['pieza'] for venta in ventas_por_tipo_list]
-    ventas_por_gramaje = [venta['gramaje'] for venta in ventas_por_tipo_list]
 
     plt.figure(figsize=(10, 6))
     bar_width = 0.35
@@ -113,7 +114,6 @@ def generar_grafico_ventas_diarias(ventas_diarias):
 
     plt.bar(indices, ventas_por_caja, bar_width, label='Caja')
     plt.bar([i + bar_width for i in indices], ventas_por_pieza, bar_width, label='Pieza')
-    plt.bar([i + bar_width * 2 for i in indices], ventas_por_gramaje, bar_width, label='Gramaje')
     
     plt.xlabel('Galleta')
     plt.ylabel('Cantidad Vendida')

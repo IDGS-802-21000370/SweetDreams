@@ -8,7 +8,6 @@
         margin-top: -20px; /* Ajusta según sea necesario para acercar */
     }
 </style>
-
 <div class="container mt-5">
     <div class="container py-5">
         <div class="row d-flex justify-content-center align-items-center">
@@ -31,6 +30,15 @@
                                     <div class="form-outline mb-4">
                                         {{ input_Form(formUsuario.contrasenia, class="form-control", placeholder="Contraseña") }}
                                     </div>
+                                    {% with messages = get_flashed_messages(with_categories=true) %}
+                                    {% if messages %}
+                                        {% for category, message in messages %}
+                                            <div class="alert alert-{{ category }}" role="alert">
+                                                {{ message }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endwith %}
                                     <div class="form-outline mb-4">
                                         {{ input_Form(formUsuario.puesto, class="form-control", placeholder="Puesto") }}
                                     </div>
@@ -82,6 +90,7 @@
                                         </tbody>
                                     </table>
                                 </form>
+                                
                             </div>
                         </div>
                     </div>

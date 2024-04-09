@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="static/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             background-color: rgb(255, 235, 205);
@@ -46,45 +47,75 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/ventas">
-                            <i class="fas fa-money-bill-wave"></i> Ventas
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/compras">
-                            <i class="fas fa-shopping-cart"></i> Compras
-                        </a>
-                    </li>                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="/inventario"><i class="fas fa-box-open"></i> Inventario <span class="sr-only">(algo)</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/produccionGalleta"><i class="fas fa-cookie-bite"></i> Producción <span class="sr-only">(algo)</span></a>
-                    </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/recetas"><i class="fas fa-utensils"></i> Recetas <span class="sr-only">(algo)</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/mermas">
-                            <i class="fas fa-trash"></i> Mermas
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/proveedores">
-                            <i class="fas fa-user-tie"></i> Proveedores
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/usuario">
-                            <i class="fas fa-user"></i> Usuarios
-                        </a>
-                    </li>                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="/dashboard">
-                            <i class="fas fa-chart-line"></i> Dashboard
-                        </a>
-                    </li>
+                        {% if current_user.is_authenticated and current_user.rol == 'admin' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/ventas">
+                                <i class="fas fa-money-bill-wave"></i> Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/compras">
+                                <i class="fas fa-shopping-cart"></i> Compras
+                            </a>
+                        </li>                    
+                        <li class="nav-item">
+                            <a class="nav-link" href="/inventario"><i class="fas fa-box-open"></i> Inventario <span class="sr-only">(algo)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/produccionGalleta"><i class="fas fa-cookie-bite"></i> Producción <span class="sr-only">(algo)</span></a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link" href="/recetas"><i class="fas fa-utensils"></i> Recetas <span class="sr-only">(algo)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/mermas">
+                                <i class="fas fa-trash"></i> Mermas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/proveedores">
+                                <i class="fas fa-user-tie"></i> Proveedores
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/usuario">
+                                <i class="fas fa-user"></i> Usuarios
+                            </a>
+                        </li>                    
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard">
+                                <i class="fas fa-chart-line"></i> Dashboard
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% if current_user.is_authenticated and current_user.rol == 'usuario' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/ventas">
+                                <i class="fas fa-money-bill-wave"></i> Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/compras">
+                                <i class="fas fa-shopping-cart"></i> Compras
+                            </a>
+                        </li>                    
+                        <li class="nav-item">
+                            <a class="nav-link" href="/inventario"><i class="fas fa-box-open"></i> Inventario <span class="sr-only">(algo)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/produccionGalleta"><i class="fas fa-cookie-bite"></i> Producción <span class="sr-only">(algo)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/mermas">
+                                <i class="fas fa-trash"></i> Mermas
+                            </a>
+                        </li>                
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard">
+                                <i class="fas fa-chart-line"></i> Dashboard
+                            </a>
+                        </li>
+                        {% endif %}
                 </ul>
                 <div class="ms-auto">
                     <a href="/login" class="btn btn-danger">Cerrar sesión</a> 
