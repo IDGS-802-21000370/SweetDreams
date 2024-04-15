@@ -30,22 +30,22 @@ def usuario():
             contraseña_ingresada = usuarioForm.contrasenia.data
             """ if not validar_contraseña_unicidad_bd(contraseña_ingresada):
                 flash('La contraseña ingresada ya está en uso.', 'error') """
-            if not validar_contraseña_unicidad_txt(contraseña_ingresada):
+            """ if not validar_contraseña_unicidad_txt(contraseña_ingresada):
                 flash('La contraseña ingresada no es segura.', 'error')
-            else:
+            else: """
                 # Si pasa ambas validaciones, procede a registrar el nuevo usuario
-                password_hash = bcrypt.hashpw(contraseña_ingresada.encode('utf-8'), bcrypt.gensalt())
-                nuevo_usuario = Usuario(
-                    nombre=usuarioForm.nombre.data,
-                    nombreUsuario=usuarioForm.nombreUsuario.data,
-                    contrasenia=password_hash,
-                    puesto=usuarioForm.puesto.data,
-                    rol=usuarioForm.rol.data
-                )
-                db.session.add(nuevo_usuario)
-                db.session.commit()
-                flash('Usuario registrado con éxito!', 'success')
-                return redirect(url_for('usuarios.usuario'))
+            #password_hash = bcrypt.hashpw(contraseña_ingresada.encode('utf-8'), bcrypt.gensalt())
+            nuevo_usuario = Usuario(
+                nombre=usuarioForm.nombre.data,
+                nombreUsuario=usuarioForm.nombreUsuario.data,
+                contrasenia=usuarioForm.contrasenia.data,
+                puesto=usuarioForm.puesto.data,
+                rol=usuarioForm.rol.data
+            )
+            db.session.add(nuevo_usuario)
+            db.session.commit()
+            flash('Usuario registrado con éxito!', 'success')
+            return redirect(url_for('usuarios.usuario'))
             
         elif 'accion' in request.form:
             accion, usuario_id_str = request.form['accion'].split('_', 1)
@@ -71,11 +71,11 @@ def usuario():
                     usuario_actualizar.nombreUsuario = usuarioForm.nombreUsuario.data
                     usuario_actualizar.puesto = usuarioForm.puesto.data
                     usuario_actualizar.rol = usuarioForm.rol.data
-                    nueva_contrasenia = usuarioForm.contrasenia.data
-                    if nueva_contrasenia:
+                    usuario_actualizar.contrasenia = usuarioForm.contrasenia.data
+                    """  if nueva_contrasenia:
                         # Hashea la nueva contraseña antes de guardarla
                         password_hash = bcrypt.hashpw(nueva_contrasenia.encode('utf-8'), bcrypt.gensalt())
-                        usuario_actualizar.contrasenia = password_hash
+                        usuario_actualizar.contrasenia = password_hash """
                     db.session.commit()
                 
             return redirect(url_for('usuarios.usuario'))

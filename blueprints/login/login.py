@@ -18,21 +18,21 @@ def login():
         contrasenia = formLogin.contrasenia.data.encode('utf-8')  
         user = Usuario.query.filter_by(nombreUsuario=nombreUsuario).first()
 
-        if user and bcrypt.checkpw(contrasenia, user.contrasenia.encode('utf-8')):
-            if user.estatus == 1:
-                login_user(user)
-                if user.rol == 'admin':
-                    return redirect(url_for('ventas.ventas'))
-                elif user.rol == 'usuario':
-                    return redirect(url_for('ventas.ventas'))
-                else:
-                    return redirect(url_for('login.login'))
+        #if user and bcrypt.checkpw(contrasenia, user.contrasenia.encode('utf-8')):
+        if user.estatus == 1:
+            login_user(user)
+            if user.rol == 'admin':
+                return redirect(url_for('ventas.ventas'))
+            elif user.rol == 'usuario':
+                return redirect(url_for('ventas.ventas'))
             else:
-                flash('El usuario no está activado', 'error')
-                return redirect(url_for('login.login')) 
+                return redirect(url_for('login.login'))
         else:
-            return 'Usuario o contraseña inválidos'
-    return render_template('ventas/ventas.html', formLogin=formLogin)
+            flash('El usuario no está activado', 'error')
+            return redirect(url_for('login.login')) 
+        """ else:
+            return 'Usuario o contraseña inválidos' """
+    return render_template('login/login.html', formLogin=formLogin)
 
 @login_blueprint.route('/logout')
 @login_required

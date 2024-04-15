@@ -148,7 +148,7 @@ def inventario():
                                     cantidad=cantidad_a_descontar,
                                     caducidad=detalle.caducidad,
                                     tipomerma_id_tipoMerma=1,  
-                                    detallemateriaprima_id_detalle_materiaprima=detalle.id_detalle_materiaprima
+                                    materiasprimas_id_materiaPrima=detalle.id_detalle_materiaprima
                                 )
                                
                                 db.session.add(merma)
@@ -160,5 +160,5 @@ def inventario():
                     print(f"Error al descontar el producto: {e}")
             else:
                 print("No se proporcionó el ID del producto en la solicitud.")
-
+                
     return render_template("inventarios/inventario.html", galleta=galleta, materia_prima=materia_prima, productos_a_caducar=productos_a_caducar, productos_a_caducarg=productos_a_caducarg, materia_prima_hacer= materia_prima_hacer)

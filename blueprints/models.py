@@ -79,6 +79,7 @@ class Receta(db.Model):
     descripcion = db.Column(db.String(300))
     totalGalletas = db.Column(db.Integer)
     precioTotal = db.Column(db.Float)
+    tiempoHornear = db.Column(db.Integer)
     fecha_actualiza = db.Column(db.DateTime, default=datetime.datetime.now)
 
 class DetalleReceta(db.Model):
@@ -115,6 +116,7 @@ class Galleta(db.Model):
     precioGramos = db.Column(db.Float)
     precioPaquete1 = db.Column(db.Float)
     precioPaquete2 = db.Column(db.Float)
+    imagen = db.Column(db.Text) 
     fecha_creacion = db.Column(db.DateTime, default=datetime.datetime.now)
     receta_id_receta = db.Column(db.Integer, db.ForeignKey('receta.id_receta'))
     receta = db.relationship('Receta', backref='galletas')

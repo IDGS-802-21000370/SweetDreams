@@ -16,10 +16,12 @@ class LoginForm(FlaskForm):
 
 class RecetaForm(Form):
     id_receta = StringField("id")
-    nombreReceta = StringField("Nombre de la receta")
+    nombreReceta = StringField("Nombre de la galleta")
     descripcion = TextAreaField("Descripcion")
     totalGalletas = StringField("Total de las galletas")
     cantidad = StringField("Cantidad")
+    tiempoHornear = StringField("Tiempo en segundos")
+    precioTotal = StringField("Precio total de la receta")
     #materiasPrimas = RadioField("Selecciona")
     tipoMedida = SelectField(choices=[(0, 'Selecciona'), (1,'Gramos'), (2,'Piezas'), (3, 'Mililitros'), (4,'Costales')])
 class mermas(Form):

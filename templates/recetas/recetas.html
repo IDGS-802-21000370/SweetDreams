@@ -2,7 +2,7 @@
 {% from "_macros.html" import input_Form %}
 {% block content %}
 <div class="container">
-    <form name="receta" action="/recetas" id="receta" method="POST">
+    <form name="receta" action="/recetas" id="receta" method="POST" enctype="multipart/form-data">
         <div class="row">
             <h2 class="titulos">Recetas</h2>
         </div>
@@ -15,24 +15,53 @@
             <div class="col-4">
                     <h4 class="titulos">Agregar nueva receta</h4>
                 <div class="col mt-2">
-                    {{input_Form(formReceta.nombreReceta, class="form-control")}} 
-                    {{input_Form(formReceta.cantidad, class="form-control", type="number")}}
+                    <div class="row">
+                        <div class="col mt-2">
+                            {{input_Form(formReceta.nombreReceta, class="form-control")}} 
+                        </div>
+                        <div class="col">
+                            <label for="file" class="form-label">Imagen de la galleta</label>
+                            <input type="file" class="form-control" name="file">
+                        </div>
+                    </div>
+                    
                         <label for="materiasPrimas" class="form-label">Selecciona la materia prima:</label>
                         <select id="carmateriasPrimass" name="materiasPrimas" class="form-select">
                             {% for mp in materiasPrimas %}
                                 <option value="{{ mp.id_materiaPrima }}">{{ mp.nombre }}</option>
                             {% endfor %}
                         </select>
-                        <label for="tipoMedidaMateriaPrima" class="form-label">Selecciona el tipo de medida:</label>
-                        <select id="tipoMedidaMateriaPrima" name="tipoMedidaMateriaPrima" class="form-select">
-                            {% for tmp in tipoMedidaMateriaPrima %}
-                                <option value="{{ tmp.id_medida }}">{{ tmp.descripcion }}</option>
-                            {% endfor %}
-                        </select>
-                        <input type="submit" id="registrar" class="btn btn-dark mt-3" name="registrar" value="Registrar"/>
+                        <div class="row">
+                            <div class="col mt-2">
+                                {{input_Form(formReceta.cantidad, class="form-control", type="number")}}
+                            </div>
+                            <div class="col">
+                                <label for="tipoMedidaMateriaPrima" class="form-label">Tipo de medida:</label>
+                                <select id="tipoMedidaMateriaPrima" name="tipoMedidaMateriaPrima" class="form-select">
+                                    {% for tmp in tipoMedidaMateriaPrima %}
+                                        <option value="{{ tmp.id_medida }}">{{ tmp.descripcion }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        
+                        <div style="text-align: center;">
+                            <input type="submit" id="registrar" class="btn btn-dark mt-3" name="registrar" value="Registrar ingrediente"/>
+                        </div>    
+                        <div class="row">
+                            <div class="col mt-2">
+                                {{input_Form(formReceta.tiempoHornear, class="form-control", type="number")}} 
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Peso por galleta</label>
+                                <input type="text" id="pesajeGramos" name="pesajeGramos" class="form-control">
+                            </div>
+                        </div>                            
                         <div class="row">
                             {{input_Form(formReceta.totalGalletas, class="form-control", type="number")}}
                             {{input_Form(formReceta.descripcion, class="form-control")}}
+                            {{input_Form(formReceta.precioTotal, class="form-control", type="number")}}
                         </div>
                 </div>
             </div>
@@ -94,6 +123,57 @@
                 <span class="close" onclick="cerrarModal()" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
                 <h3 style="color: red;">NOTIFICACIÓN</h3>
                 <p>Ya existe la receta con el id {{id_re}}</p>
+            </div>
+        </div>
+    </div>
+    
+    {% endif %}
+    {% if mostrar_modal_campos %}
+    <div>
+        <div id="modal" class="modal" style="{% if mostrar_modal_campos %}display: block;{% else %}display: none;{% endif %}">
+            <div class="modal-content">
+                <span class="close" onclick="cerrarModal()" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
+                <h3 style="color: red;">NOTIFICACIÓN</h3>
+                <p>No puede haber campos vacios</p>
+            </div>
+        </div>
+    </div>
+    
+    {% endif %}
+
+    {% if mostrar_modal_campos_ingrdientes %}
+    <div>
+        <div id="modal" class="modal" style="{% if mostrar_modal_campos_ingrdientes %}display: block;{% else %}display: none;{% endif %}">
+            <div class="modal-content">
+                <span class="close" onclick="cerrarModal()" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
+                <h3 style="color: red;">NOTIFICACIÓN</h3>
+                <p>Agrega ingredientes a la receta</p>
+            </div>
+        </div>
+    </div>
+    
+    {% endif %}
+
+    {% if modal_cantidad %}
+    <div>
+        <div id="modal" class="modal" style="{% if modal_cantidad %}display: block;{% else %}display: none;{% endif %}">
+            <div class="modal-content">
+                <span class="close" onclick="cerrarModal()" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
+                <h3 style="color: red;">NOTIFICACIÓN</h3>
+                <p>Agrega una cantidad del ingrediente</p>
+            </div>
+        </div>
+    </div>
+    
+    {% endif %}
+
+    {% if modal_ingrediente_repetido %}
+    <div>
+        <div id="modal" class="modal" style="{% if modal_ingrediente_repetido %}display: block;{% else %}display: none;{% endif %}">
+            <div class="modal-content">
+                <span class="close" onclick="cerrarModal()" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
+                <h3 style="color: red;">NOTIFICACIÓN</h3>
+                <p>No se puede agregar el mismo ingrediente</p>
             </div>
         </div>
     </div>
