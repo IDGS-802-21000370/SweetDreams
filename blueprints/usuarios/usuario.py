@@ -3,37 +3,38 @@ import blueprints.forms as forms
 from blueprints.models import Usuario, db
 import bcrypt
 from flask import flash
+import re
+from functools import wraps
+from flask import redirect, url_for
+from flask_login import current_user
 
 usuario_blueprint = Blueprint("usuarios", __name__, template_folder="templates")
-def validar_contraseña_unicidad_bd(contraseña):
-    contraseñas_registradas = [usuario.contrasenia for usuario in Usuario.query.all()]
-    for contraseña_registrada in contraseñas_registradas:
-        # Asegurarse de que tanto la contraseña como el hash estén en formato de bytes
-        contraseña_bytes = contraseña.encode('utf-8')
-        hash_bytes = contraseña_registrada.encode('utf-8')
-        if bcrypt.checkpw(contraseña_bytes, hash_bytes):
-            return False
-    return True
 
-def validar_contraseña_unicidad_txt(contraseña):
-    with open('contraseñas.txt', 'r') as file:
-        contraseñas = file.readlines()
-        contraseñas = [contraseña.strip() for contraseña in contraseñas]
-        return contraseña not in contraseñas
+
+def admin_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not current_user.is_authenticated or current_user.rol != 'admin':
+            return redirect(url_for('login.login'))
+        return func(*args, **kwargs)
+    return decorated_view
 
 @usuario_blueprint.route("/usuario", methods=["GET", "POST"])
+@admin_required
 def usuario():
     usuarioForm = forms.UsuarioForm(request.form)
     usuarios = Usuario.query.filter_by(estatus=1).all()
     if request.method == 'POST':
         if 'registrar' in request.form:
             contraseña_ingresada = usuarioForm.contrasenia.data
-            """ if not validar_contraseña_unicidad_bd(contraseña_ingresada):
-                flash('La contraseña ingresada ya está en uso.', 'error') """
-            if not validar_contraseña_unicidad_txt(contraseña_ingresada):
-                flash('La contraseña ingresada no es segura.', 'error')
+            es_segura, mensaje = validar_contraseña_segura(contraseña_ingresada)
+            if not es_segura:
+                flash(mensaje, 'warning')
+            elif not validar_contraseña_unicidad_bd(contraseña_ingresada):
+                flash('La contraseña ingresada ya está en uso.', 'warning')
+            elif not validar_contraseña_unicidad_txt(contraseña_ingresada):
+                flash('La contraseña ingresada no es segura.', 'warning')
             else:
-                # Si pasa ambas validaciones, procede a registrar el nuevo usuario
                 password_hash = bcrypt.hashpw(contraseña_ingresada.encode('utf-8'), bcrypt.gensalt())
                 nuevo_usuario = Usuario(
                     nombre=usuarioForm.nombre.data,
@@ -63,8 +64,13 @@ def usuario():
             nombre_usuario = usuarioForm.nombreUsuario.data
             contraseña_ingresada = usuarioForm.contrasenia.data
             usuario_actualizar = Usuario.query.filter_by(nombreUsuario=nombre_usuario).first()
-            if not validar_contraseña_unicidad_txt(contraseña_ingresada):
-                flash('La contraseña ingresada no es segura.', 'error')
+            es_segura, mensaje = validar_contraseña_segura(contraseña_ingresada)
+            if not es_segura:
+                flash(mensaje, 'warning')
+            elif not validar_contraseña_unicidad_bd(contraseña_ingresada):
+                flash('La contraseña ingresada ya está en uso.', 'warning')
+            elif not validar_contraseña_unicidad_txt(contraseña_ingresada):
+                flash('La contraseña ingresada no es segura.', 'warning')
             else:
                 if usuario_actualizar:
                     usuario_actualizar.nombre = usuarioForm.nombre.data
@@ -73,7 +79,6 @@ def usuario():
                     usuario_actualizar.rol = usuarioForm.rol.data
                     nueva_contrasenia = usuarioForm.contrasenia.data
                     if nueva_contrasenia:
-                        # Hashea la nueva contraseña antes de guardarla
                         password_hash = bcrypt.hashpw(nueva_contrasenia.encode('utf-8'), bcrypt.gensalt())
                         usuario_actualizar.contrasenia = password_hash
                     db.session.commit()
@@ -86,3 +91,31 @@ def usuario():
             db.session.commit()
             return redirect(url_for('usuarios.usuario'))
     return render_template("usuario/usuario.html", formUsuario=usuarioForm, usuarios=usuarios)
+
+def validar_contraseña_segura(contraseña):
+    if len(contraseña) < 8:
+        return False, "La contraseña debe tener al menos 8 caracteres."
+    if not re.search("[A-Z]", contraseña):
+        return False, "La contraseña debe incluir al menos una letra mayúscula."
+    if not re.search("[a-z]", contraseña):
+        return False, "La contraseña debe incluir al menos una letra minúscula."
+    if not re.search("[0-9]", contraseña):
+        return False, "La contraseña debe incluir al menos un número."
+    if not re.search("[@_!#$%^&*()<>?/|}{~:.,]", contraseña):
+        return False, "La contraseña debe incluir al menos un carácter especial."
+    return True, "La contraseña es segura."
+
+def validar_contraseña_unicidad_bd(contraseña):
+    contraseñas_registradas = [usuario.contrasenia for usuario in Usuario.query.all()]
+    for contraseña_registrada in contraseñas_registradas:
+        contraseña_bytes = contraseña.encode('utf-8')
+        hash_bytes = contraseña_registrada.encode('utf-8')
+        if bcrypt.checkpw(contraseña_bytes, hash_bytes):
+            return False
+    return True
+
+def validar_contraseña_unicidad_txt(contraseña):
+    with open('contraseñas.txt', 'r') as file:
+        contraseñas = file.readlines()
+        contraseñas = [contraseña.strip() for contraseña in contraseñas]
+        return contraseña not in contraseñas

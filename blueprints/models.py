@@ -17,6 +17,8 @@ class Usuario(db.Model, UserMixin):
     rol = db.Column(db.String(100))
     estatus = db.Column(db.Integer, default=1)
     fecha_creacion = db.Column(db.DateTime, default=datetime.datetime.now)
+    ultimo_inicio_sesion = db.Column(db.DateTime, default=datetime.datetime.now)
+    intentos=db.Column(db.Integer, default=0)
     def get_id(self):
         return str(self.id_usuario)
 

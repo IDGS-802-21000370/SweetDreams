@@ -9,9 +9,9 @@ from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp
 
 class LoginForm(FlaskForm):
     usuario = StringField("Nombre de usuario", [validators.DataRequired(message="el campo es requerido"), 
-                         validators.Length(min=1, max=10, message="ingresa nombre valido")])
+                         validators.Length(min=1, max=30, message="ingresa nombre valido")])
     contrasenia = StringField("Contraseña", [validators.DataRequired(message="el campo es requerido"), 
-                         validators.Length(min=1, max=10, message="ingresa nombre valido")])
+                         validators.Length(min=1, max=30, message="ingresa nombre valido")])
     
 
 class RecetaForm(Form):
@@ -74,11 +74,7 @@ class UsuarioForm(FlaskForm):
                          validators.Length(min=1, max=30, message="ingresa usuario valido")])
     contrasenia = PasswordField("Contraseña", validators=[
         DataRequired(message="El campo es requerido"),
-        Length(min=8, message='La contraseña debe tener al menos 8 caracteres'),
-        Regexp(r'[A-Z]', message='La contraseña debe contener al menos una letra mayúscula'),
-        Regexp(r'[a-z]', message='La contraseña debe contener al menos una letra minúscula'),
-        Regexp(r'\d', message='La contraseña debe contener al menos un número'),
-        Regexp(r'[!@#$%&*?]', message='La contraseña debe contener al menos un carácter especial')
+        Length(min=8, message='La contraseña debe tener al menos 8 caracteres')
     ])
     puesto = StringField("Puesto", [validators.DataRequired(message="el campo es requerido"), 
                          validators.Length(min=1, max=30, message="ingresa puesto valido")])

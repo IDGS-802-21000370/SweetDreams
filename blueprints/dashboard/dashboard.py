@@ -1,21 +1,18 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template
 from datetime import datetime, timedelta
-from sqlalchemy import extract
-from blueprints.models import DetalleVentas, Galleta, TipoVenta, Venta, db
 from sqlalchemy import func
-import matplotlib.pyplot as plt
-import matplotlib
-matplotlib.use('Agg')
-import io
-import base64
+from blueprints.models import DetalleVentas, Galleta, TipoVenta, Venta, db
+import pandas as pd
+import plotly.express as px
+from plotly.io import to_html
 
 dashboard_blueprint = Blueprint("dashboard", __name__, template_folder="templates")
 
 @dashboard_blueprint.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
     ventas_diarias = calcular_ventas_diarias()
-    plot_url_ventas_diarias, plot_url_productos_vendidos, plot_url_ventas_tipo = generar_grafico_ventas_diarias(ventas_diarias)
-    return render_template('dashboard/dashboard.html', plot_url_ventas_diarias=plot_url_ventas_diarias, plot_url_productos_vendidos=plot_url_productos_vendidos, plot_url_ventas_tipo=plot_url_ventas_tipo)
+    plot_html_ventas_diarias, plot_html_productos_vendidos, plot_html_ventas_tipo = generar_graficos(ventas_diarias)
+    return render_template('dashboard/dashboard.html', plot_html_ventas_diarias=plot_html_ventas_diarias, plot_html_productos_vendidos=plot_html_productos_vendidos, plot_html_ventas_tipo=plot_html_ventas_tipo)
 
 def calcular_ventas_diarias():
     fecha_actual = datetime.now().date()
@@ -33,54 +30,25 @@ def calcular_ventas_diarias():
 
     return ventas_diarias
 
-def generar_grafico_ventas_diarias(ventas_diarias):
-    labels = [venta.fecha.strftime('%Y-%m-%d') for venta in ventas_diarias]
-    values = [venta.total for venta in ventas_diarias]
-
-    plt.figure(figsize=(10, 6))
-    plt.bar(labels, values)
-    plt.xlabel('Fecha')
-    plt.ylabel('Total Vendido')
-    plt.title('Ventas Diarias')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-
-    image_stream_ventas_diarias = io.BytesIO()
-    plt.savefig(image_stream_ventas_diarias, format='png')
-    image_stream_ventas_diarias.seek(0)
-    plt.close()
-
+def generar_graficos(ventas_diarias):
+    # Gráfico de Ventas Diarias
+    df_ventas_diarias = pd.DataFrame(ventas_diarias, columns=['fecha', 'total'])
+    fig_ventas_diarias = px.bar(df_ventas_diarias, x='fecha', y='total', title='Ventas Diarias')
+    plot_html_ventas_diarias = to_html(fig_ventas_diarias, full_html=False)
+    
+    # Gráfico de Productos Más Vendidos
     detalles_ventas = db.session.query(
         DetalleVentas.galleta_id_galleta,
         func.sum(DetalleVentas.cantidad).label('total_vendido')
     ).group_by(
         DetalleVentas.galleta_id_galleta
     ).all()
+    df_productos_vendidos = pd.DataFrame(detalles_ventas, columns=['galleta_id', 'total_vendido'])
+    df_productos_vendidos['producto'] = df_productos_vendidos['galleta_id'].apply(lambda id: Galleta.query.get(id).nombre)
+    fig_productos_vendidos = px.bar(df_productos_vendidos, x='producto', y='total_vendido', title='Productos Más Vendidos')
+    plot_html_productos_vendidos = to_html(fig_productos_vendidos, full_html=False)
 
-    ventas_por_producto = {detalle.galleta_id_galleta: detalle.total_vendido for detalle in detalles_ventas}
-
-    productos_mas_vendidos = sorted(
-        ventas_por_producto.items(), 
-        key=lambda x: x[1], 
-        reverse=True
-    )[:5]
-
-    nombres_productos_mas_vendidos = [Galleta.query.get(id_galleta).nombre for id_galleta, _ in productos_mas_vendidos]
-    cantidades_productos_mas_vendidos = [cantidad for _, cantidad in productos_mas_vendidos]
-
-    plt.figure(figsize=(10, 6))
-    plt.bar(nombres_productos_mas_vendidos, cantidades_productos_mas_vendidos)
-    plt.xlabel('Producto')
-    plt.ylabel('Cantidad Vendida')
-    plt.title('Productos Más Vendidos')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-
-    image_stream_productos_vendidos = io.BytesIO()
-    plt.savefig(image_stream_productos_vendidos, format='png')
-    image_stream_productos_vendidos.seek(0)
-    plt.close()
-
+    # Gráfico de Ventas por Tipo de Galleta
     detalles_ventas_tipos = db.session.query(
         DetalleVentas.galleta_id_galleta,
         DetalleVentas.tipoventa_id_tipoVenta,
@@ -89,46 +57,36 @@ def generar_grafico_ventas_diarias(ventas_diarias):
         DetalleVentas.galleta_id_galleta,
         DetalleVentas.tipoventa_id_tipoVenta
     ).all()
+    df_ventas_tipo = pd.DataFrame(detalles_ventas_tipos, columns=['galleta_id', 'tipo_venta_id', 'total_vendido'])
+    df_ventas_tipo['tipo_venta'] = df_ventas_tipo['tipo_venta_id'].apply(lambda id: TipoVenta.query.get(id).descripcion)
+    df_ventas_tipo['producto'] = df_ventas_tipo['galleta_id'].apply(lambda id: Galleta.query.get(id).nombre)
+    fig_ventas_tipo = px.bar(df_ventas_tipo, x='producto', y='total_vendido', color='tipo_venta', title='Ventas por Tipo de Galleta')
+    plot_html_ventas_tipo = to_html(fig_ventas_tipo, full_html=False)
+    fig_ventas_diarias = px.bar(
+    df_ventas_diarias, 
+    x='fecha', 
+    y='total', 
+    title='Ventas Diarias',
+    color_discrete_sequence=['#b0c2f2']  # Cambia el color aquí; usa un código de color hex
+    )
+    fig_productos_vendidos = px.bar(
+    df_productos_vendidos, 
+    x='producto', 
+    y='total_vendido', 
+    title='Productos Más Vendidos',
+    color_discrete_sequence=['#b0f2c2']  # Cambia el color aquí
+    )
+    fig_ventas_tipo = px.bar(
+    df_ventas_tipo, 
+    x='producto', 
+    y='total_vendido', 
+    color='tipo_venta',
+    title='Ventas por Tipo de Galleta',
+    color_discrete_map={
+        'Tipo 1': '#c5c6c8',  # Cambia 'Tipo 1' por la descripción real del tipo de venta
+        'Tipo 2': '#b0f2c2',
+        'Tipo 3': '#b0c2f2'
+    }
+    )
 
-    ventas_por_tipo = {}
-    for detalle in detalles_ventas_tipos:
-        galleta_id = detalle.galleta_id_galleta
-        tipo_venta_id = detalle.tipoventa_id_tipoVenta
-        tipo_venta_nombre = TipoVenta.query.get(tipo_venta_id).descripcion
-        cantidad = detalle.total_vendido
-        if galleta_id not in ventas_por_tipo:
-            ventas_por_tipo[galleta_id] = {}
-        ventas_por_tipo[galleta_id][tipo_venta_nombre] = cantidad
-
-    nombres_galletas = [Galleta.query.get(id_galleta).nombre for id_galleta in ventas_por_tipo.keys()]
-    
-    ventas_por_tipo_list = [ventas_por_tipo.get(galleta_id, {}) for galleta_id in ventas_por_tipo.keys()]
-    ventas_por_tipo_list = [{'caja': venta.get('caja', 0), 'pieza': venta.get('pieza', 0)} for venta in ventas_por_tipo_list]
-
-    ventas_por_caja = [venta['caja'] for venta in ventas_por_tipo_list]
-    ventas_por_pieza = [venta['pieza'] for venta in ventas_por_tipo_list]
-
-    plt.figure(figsize=(10, 6))
-    bar_width = 0.35
-    indices = range(len(nombres_galletas))
-
-    plt.bar(indices, ventas_por_caja, bar_width, label='Caja')
-    plt.bar([i + bar_width for i in indices], ventas_por_pieza, bar_width, label='Pieza')
-    
-    plt.xlabel('Galleta')
-    plt.ylabel('Cantidad Vendida')
-    plt.title('Ventas por Tipo de Galleta')
-    plt.xticks([i + bar_width for i in indices], nombres_galletas, rotation=45)
-    plt.legend()
-    plt.tight_layout()
-
-    image_stream_ventas_tipo = io.BytesIO()
-    plt.savefig(image_stream_ventas_tipo, format='png')
-    image_stream_ventas_tipo.seek(0)
-    plt.close()
-
-    image_base64_ventas_diarias = base64.b64encode(image_stream_ventas_diarias.getvalue()).decode('utf-8')
-    image_base64_productos_vendidos = base64.b64encode(image_stream_productos_vendidos.getvalue()).decode('utf-8')
-    image_base64_ventas_tipo = base64.b64encode(image_stream_ventas_tipo.getvalue()).decode('utf-8')
-
-    return image_base64_ventas_diarias, image_base64_productos_vendidos, image_base64_ventas_tipo
+    return plot_html_ventas_diarias, plot_html_productos_vendidos, plot_html_ventas_tipo
