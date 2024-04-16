@@ -9,9 +9,23 @@ from reportlab.lib.colors import blue, brown
 from reportlab.lib.pagesizes import LETTER, A4
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import inch
+from flask_login import login_required
+from  functools import wraps
+from flask_login import current_user
+
 w, h = LETTER
 
 venta_blueprint = Blueprint("ventas", __name__, template_folder="templates")
+
+def admin_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not current_user.is_authenticated:
+            # Redirigir a una página de acceso denegado o a la página principal
+            return render_template('404/404.html')
+        return func(*args, **kwargs)
+    return decorated_view
+
 quedan_galletas = {
     "Chispas de Chocolate": 15,  
     "Mantequilla": 10,              
@@ -25,7 +39,9 @@ quedan_galletas = {
     "Almendras":7,
 }
 menu_items = []
+
 @venta_blueprint.route("/ventas", methods=["GET", "POST"])
+@admin_required
 def ventas():
     galletas=Galleta.query.all()
     galletasc = Galleta.query.filter(Galleta.cantidad < 10).all()

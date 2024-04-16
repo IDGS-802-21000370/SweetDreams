@@ -7,15 +7,16 @@ import re
 from functools import wraps
 from flask import redirect, url_for
 from flask_login import current_user
+from  functools import wraps
+from flask_login import current_user
 
 usuario_blueprint = Blueprint("usuarios", __name__, template_folder="templates")
-
-
 def admin_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
-        if not current_user.is_authenticated or current_user.rol != 'admin':
-            return redirect(url_for('login.login'))
+        if not current_user.is_authenticated:
+            # Redirigir a una página de acceso denegado o a la página principal
+            return render_template('404/404.html')
         return func(*args, **kwargs)
     return decorated_view
 
@@ -30,8 +31,8 @@ def usuario():
             es_segura, mensaje = validar_contraseña_segura(contraseña_ingresada)
             if not es_segura:
                 flash(mensaje, 'warning')
-            elif not validar_contraseña_unicidad_bd(contraseña_ingresada):
-                flash('La contraseña ingresada ya está en uso.', 'warning')
+                """ elif not validar_contraseña_unicidad_bd(contraseña_ingresada):
+                flash('La contraseña ingresada ya está en uso.', 'warning') """
             elif not validar_contraseña_unicidad_txt(contraseña_ingresada):
                 flash('La contraseña ingresada no es segura.', 'warning')
             else:

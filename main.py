@@ -17,12 +17,14 @@ from blueprints.compras.compra import compra_blueprint
 from blueprints.models import Usuario, db
 from flask_login import LoginManager, current_user
 from flask_admin import Admin, AdminIndexView
+from flask_cors import CORS
 
 app = Flask(__name__)
 csrf = CSRFProtect()
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login.login'
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://192.168.1.228:8080"}})
 
 class MyAdminIndexView(AdminIndexView):
     def is_accessible(self):

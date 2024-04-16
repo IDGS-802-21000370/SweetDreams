@@ -2,10 +2,21 @@ from flask import Blueprint, redirect, render_template, request, url_for
 from blueprints.models import Proveedor, db
 from blueprints.provedores import provedor
 import blueprints.forms as forms
+from  functools import wraps
+from flask_login import current_user
 
 proveedor_blueprint = Blueprint("provedores", __name__, template_folder="templates")
+def admin_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not current_user.is_authenticated:
+            # Redirigir a una página de acceso denegado o a la página principal
+            return render_template('404/404.html')
+        return func(*args, **kwargs)
+    return decorated_view
 
 @proveedor_blueprint.route("/proveedores", methods=["GET", "POST"])
+@admin_required
 def proveedorIndex():
     proveedores = Proveedor.query.filter_by(estatus=1).all()
     
@@ -23,6 +34,7 @@ def proveedorIndex():
 
 
 @proveedor_blueprint.route("/proveedoresForm", methods=["GET", "POST"])
+@admin_required
 def prooveedorForm():
     prvdForm=forms.ProveedorForm(request.form)
     if request.method=="POST":
@@ -37,6 +49,7 @@ def prooveedorForm():
     return render_template("proveedor/proveedorForm.html", formProveedor=prvdForm)
 
 @proveedor_blueprint.route("/proveedoresUpdate", methods=["GET", "POST"])
+@admin_required
 def prooveedorUpdate():
     prvdForm=forms.getProveedor(request.form)
     if request.method=='GET':
@@ -59,6 +72,7 @@ def prooveedorUpdate():
     return render_template("proveedor/proveedorM.html", formProveedor=prvdForm)
 
 @proveedor_blueprint.route("/proveedorE", methods=["GET", "POST"])
+@admin_required
 def proveedorEliminado():
     proveedores = Proveedor.query.filter_by(estatus=0).all()
     

@@ -1,14 +1,24 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for
 import blueprints.forms as forms
 from blueprints.models import Compra, DetalleCompra, Caja, CajaRetiro, DetalleMateriaPrima, MateriasPrimas, db
 from datetime import datetime
-from flask_login import current_user
+from flask_login import current_user, login_required
+from functools import wraps
 
 compra_blueprint = Blueprint("compras", __name__, template_folder="templates")
+def admin_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not current_user.is_authenticated:
+            # Redirigir a una página de acceso denegado o a la página principal
+            return render_template('404/404.html')
+        return func(*args, **kwargs)
+    return decorated_view
 
 MPrima = []
 MPrimaTexto = []
 @compra_blueprint.route("/compras", methods=["GET", "POST"])
+@admin_required
 def compraIndex():
     compras = Compra.query.all()
         

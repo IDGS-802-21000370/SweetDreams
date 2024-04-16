@@ -1,10 +1,21 @@
 from flask import Blueprint, current_app, jsonify, render_template, redirect, request
 from blueprints.produccion.produccionGalletas import Guardar
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import current_user
+from functools import wraps
 
 produccion_blueprint = Blueprint("produccion", __name__, template_folder="templates")
+def admin_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not current_user.is_authenticated:
+            # Redirigir a una página de acceso denegado o a la página principal
+            return render_template('404/404.html')
+        return func(*args, **kwargs)
+    return decorated_view
 
 @produccion_blueprint.route("/produccionGalleta", methods=["GET", "POST"])
+@admin_required
 def produccionGalletas():
     galletas_en_preparacion = []
     galletas_preparadas = []
