@@ -12,6 +12,16 @@
 }
 
 </style>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 <div class="container mt-5">
         <div class="container py-5 h-100">
           <div class="row d-flex justify-content-center align-items-center h-100">
@@ -39,16 +49,10 @@
       
                         <div class="text-center pt-1 mb-5 pb-1">
                           <button type="submit" class="btn btn-outline-dark">Iniciar sessión</button>
-                          <!-- <a class="text-muted" href="#!">Forgot password?</a> -->
                         </div>
        
-                        <!-- <div class="d-flex align-items-center justify-content-center pb-4">
-                          <p class="mb-0 me-2">Eres nuevo</p>
-                          <a href="/usuario" class="btn btn-outline-link">Regístrate</a>
-                      </div> -->
       
                       </form>
-      
                     </div>
                   </div>
                   <div class="col-lg-6 d-flex align-items-center gradient-custom-2">

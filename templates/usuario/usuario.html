@@ -8,9 +8,17 @@
         margin-top: -20px; /* Ajusta según sea necesario para acercar */
     }
 </style>
-
-<div class="container mt-5">
-    <div class="container py-5">
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<div class="container mb-4">
+    <div>
         <div class="row d-flex justify-content-center align-items-center">
             <div class="col-xl-10">
                 <div class="card rounded-3 text-black">
@@ -82,6 +90,7 @@
                                         </tbody>
                                     </table>
                                 </form>
+                                
                             </div>
                         </div>
                     </div>
