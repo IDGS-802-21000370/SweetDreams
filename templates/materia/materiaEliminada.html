@@ -1,34 +1,34 @@
 {% extends 'layoutPrincipal.html' %}
 {% from "_macros.html" import input_Form %}
 {% block content %}
-<form name="compra" action="" id="compra" method="post">
+<form name="materia" action="" id="materia" method="post">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 <div class="container">
     <div class="row">
         <div class="row">
             <div class="col-10">
-                <h2 class="titulos">Detalle Compra</h2>
+                <h2 class="titulos">Materia Primma Eliminada</h2>
             </div>
             <div class="col-2">
-                <a href="/compras" class="btn btn-primary">Regresar</a>
+                <a href="/materiaprima" class="btn btn-primary">Regresar</a>
             </div>
         </div>
         <table class="table table-striped table-bordered mt-4">
             <thead>
                 <tr>
-                    <th>Nombre Empresa Proveedor</th>
-                    <th>Materia Prima</th>
+                    <th>Nombre</th>
                     <th>Cantidad</th>
-                    <th>Tipo de Medida</th>
+                    <th>Tipo Medida</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
-                {%for dtCrp in dCompra%}
+                {%for mtpm in MateriasE %}
                 <tr>
-                    <td>{{dtCrp.proveedor.nombreEmpresa}}</td>
-                    <td>{{dtCrp.materia_prima.nombre}}</td>
-                    <td>{{dtCrp.cantidad}}</td>
-                    <td>{{dtCrp.tipo_medida.descripcion}}</td>
+                    <td>{{mtpm.nombre}}</td>
+                    <td>{{mtpm.cantidad}}</td>
+                    <td>{{mtpm.tipo_medida.descripcion}}</td>
+                    <td><button class="btn btn-warning" name="buttonMP" value="{{mtpm.id_materiaPrima}}" id="btnRestaurarMP">Restaurar</button></td>
                 </tr>
                 {%endfor%}
             </tbody>

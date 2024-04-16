@@ -1,0 +1,37 @@
+{% extends 'layoutPrincipal.html' %}
+{% from "_macros.html" import input_Form %}
+{% block content %}
+<form name="materia" action="" id="materia" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-8">
+                <h2 class="titulos">Nueva Materia Prima</h2>
+            </div>
+            <div class="col-4 d-flex justify-content-center">
+                <a href="/materiaprima" class="btn btn-primary">Regresar</a>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-8">
+                {{input_Form(formMateria.id, class="form-control", readonly="readonly")}}
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-8">
+                {{input_Form(formMateria.nombre, class="form-control")}}
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-8">
+                {{input_Form(formMateria.tipoMedida, class="form-control")}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-8 d-flex justify-content-center">   
+                <button class="btn btn-success" type="submit" name="btnMtrP" value="btnModificarMtrP" id="btnModificarMtrP">Modificar</button>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

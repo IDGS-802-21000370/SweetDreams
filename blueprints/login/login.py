@@ -4,46 +4,62 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_sqlalchemy import SQLAlchemy
-from blueprints.models import Usuario
+from blueprints.models import Usuario, db
+import bcrypt
+from flask import flash
+import logging
+from datetime import datetime
 
 login_blueprint = Blueprint("login", __name__, template_folder="templates")
+
+logging.basicConfig(filename='login_logs.log', level=logging.INFO,
+                    format='%(asctime)s:%(levelname)s:%(message)s')
 
 @login_blueprint.route('/login', methods=['GET', 'POST'])
 def login():
     formLogin = forms.LoginForm()
     if formLogin.validate_on_submit():
         nombreUsuario = formLogin.usuario.data
-        contrasenia = formLogin.contrasenia.data
+        contrasenia = formLogin.contrasenia.data.encode('utf-8')  
         user = Usuario.query.filter_by(nombreUsuario=nombreUsuario).first()
-        if user and user.contrasenia == contrasenia:
-            if user.estatus == 1:
-                login_user(user)
-                if user.rol == 'admin':
-                    return redirect(url_for('login.admin'))
-                elif user.rol == 'usuario':
-                    return redirect(url_for('login.user'))
+        #if user and user.contrasenia:
+        if user:
+            if user.intentos < 3:
+                if bcrypt.checkpw(contrasenia, user.contrasenia.encode('utf-8')):
+                    if user.estatus == 1:
+                        user.intentos = 0
+                        user.ultimo_inicio_sesion = datetime.now()
+                        db.session.commit()
+                        login_user(user)
+                        logging.info(f'Inicio de sesión exitoso para el usuario: {nombreUsuario}')
+                        if user.rol == 'admin':
+                            return redirect(url_for('admin.index'))
+                        elif user.rol == 'usuario':
+                            return redirect(url_for('admin.index'))
+                    else:
+                        flash('El usuario no está activado', 'warning')
+                        logging.warning(f'Intento de inicio de sesión fallido para el usuario desactivado: {nombreUsuario}')
                 else:
-                    return redirect(url_for('login.login'))
+                    user.intentos += 1
+                    db.session.commit()
+                    flash('Nombre de usuario o contraseña incorrecta.', 'warning')
+                    logging.warning(f'Intento de inicio de sesión fallido para el usuario: {nombreUsuario}')
             else:
-                return 'El usuario no está activado'
+                user.estatus = 0  # Bloquear usuario
+                db.session.commit()
+                flash('Este usuario ha sido bloqueado por intentos fallidos', 'warning')
         else:
-            return 'Usuario o contraseña inválidos'
+            flash('Nombre de usuario o contraseña incorrecta.', 'warning')
+            logging.warning(f'Intento de inicio de sesión fallido para el usuario: {nombreUsuario}')
+        
+        return redirect(url_for('login.login')) 
+
     return render_template('login/login.html', formLogin=formLogin)
 
 @login_blueprint.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('login.logout'))
-
-@login_blueprint.route('/user')
-@login_required
-def user():
-    return render_template('layoutPrincipal.html')
-
-@login_blueprint.route('/admin')
-@login_required
-def admin():
-    return render_template('layoutPrincipal.html')
+    return redirect(url_for('login.login'))
 
  

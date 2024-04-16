@@ -4,8 +4,6 @@ from datetime import datetime
 import os
 import time
 from flask import Flask, render_template,request,Response
-from flask_socketio import SocketIO
-
 import blueprints.forms as forms
 from sqlalchemy import cast
 from flask_wtf.csrf import CSRFProtect

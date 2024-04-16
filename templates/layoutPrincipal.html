@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="static/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             background: linear-gradient(-150deg, #f4d2b8 30%, #cfa77b 70%);
@@ -32,13 +33,27 @@
             justify-content: center;    
             align-items: center;
         }
+        .alert {
+            padding: 10px;
+            background-color: #f4f4f4;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .success {
+            color: #155724;
+            background-color: #d4edda;
+        }
+        .warning {
+            color: #721c24;
+            background-color: #f8d7da;
+        }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg fixed-top" style="background-color: rgba(255, 255, 255)">
         <div class="container-fluid">
             <img src="static/img/logoSweetDreamsSF.png" style="width: 40px;" alt="logo">
-            <a class="navbar-brand" href="/login">Sweet Dreams</a>
+            <a class="navbar-brand" href="/logout">Sweet Dreams</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -46,38 +61,52 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/recetas"><i class="fas fa-utensils"></i> Recetas <span class="sr-only">(algo)</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/inventario"><i class="fas fa-box-open"></i> Inventario <span class="sr-only">(algo)</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/produccionGalleta"><i class="fas fa-cookie-bite"></i> Producción <span class="sr-only">(algo)</span></a>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="/mermas">
-                            <i class="fas fa-trash"></i> Mermas
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/ventas">
-                            <i class="fas fa-money-bill-wave"></i> Ventas
-                        </a>
-                    </li>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/dashboard">
-                        <i class="fas fa-chart-line"></i> Dashboard
-                    </a>
-                </li>
-                
-                    
-                    
+                    <!-- <li class="nav-item">
+                        <a class="nav-link" href="/ventas">Ventas</a>
+                    </li> -->
+                        {% if current_user.is_authenticated and current_user.rol == 'admin' %}
+                            <li class="nav-item active">
+                                <a class="nav-link" href="/usuario"><i class="fas fa-utensils"></i> Usuarios <span class="sr-only">(algo)</span></a>
+                            </li>
+                            <li class="nav-item active">
+                                <a class="nav-link" href="/recetas"><i class="fas fa-utensils"></i> Recetas <span class="sr-only">(algo)</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/inventario"><i class="fas fa-box-open"></i> Inventario <span class="sr-only">(algo)</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/produccionGalleta"><i class="fas fa-cookie-bite"></i> Producción <span class="sr-only">(algo)</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/compra">Compras</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/dashboard">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/proveedor">Proveedor</a>
+                            </li>
+                        {% endif %}
+                        {% if current_user.is_authenticated and current_user.rol == 'usuario' %}
+                            <li class="nav-item active">
+                                <a class="nav-link" href="/recetas"><i class="fas fa-utensils"></i> Recetas <span class="sr-only">(algo)</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/inventario"><i class="fas fa-box-open"></i> Inventario <span class="sr-only">(algo)</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/produccionGalleta"><i class="fas fa-cookie-bite"></i> Producción <span class="sr-only">(algo)</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/compra"><i class="fas fa-cookie-bite"></i> Compra <span class="sr-only">(algo)</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/dashboard"><i class="fas fa-cookie-bite"></i> Dashboard <span class="sr-only">(algo)</span></a>
+                            </li>
+                        {% endif %}
                 </ul>
                 <div class="ms-auto">
-                    <a href="/login" class="btn btn-danger">Cerrar sesión</a> 
+                    <a href="/logout" class="btn btn-danger">Cerrar sesión</a> 
                 </div>
             </div>
         </div>
