@@ -77,6 +77,7 @@ class Receta(db.Model):
     nombre = db.Column(db.String(100))
     descripcion = db.Column(db.String(300))
     totalGalletas = db.Column(db.Integer)
+    tiempo = db.Column(db.Integer)
     precioTotal = db.Column(db.Float)
     fecha_actualiza = db.Column(db.DateTime, default=datetime.datetime.now)
 
