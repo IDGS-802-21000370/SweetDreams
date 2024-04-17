@@ -35,6 +35,7 @@ class MateriasPrimas(db.Model):
     nombre = db.Column(db.String(100))
     caducidad = db.Column(db.DateTime)
     fecha_creacion = db.Column(db.DateTime, default=datetime.datetime.now)
+    estatus = db.Column(db.Integer, default=1)
     tipomedidasmaterialprimas_id_medida = db.Column(db.Integer, db.ForeignKey('tipo_medidas_material_primas.id_medida'))
     tipo_medida = db.relationship('TipoMedidasMaterialPrimas', backref='materias_primas')
 
@@ -46,6 +47,16 @@ class Proveedor(db.Model):
     fecha_creacion = db.Column(db.DateTime, default=datetime.datetime.now)
     estatus = db.Column(db.Integer, default=1)
 
+class DetalleProveedorMateria(db.Model):
+    id_detalle_proveedormateria = db.Column(db.Integer, primary_key=True)
+    estatus = db.Column(db.Integer, default=1)
+    materiasprimas_id_materiaPrima = db.Column(db.Integer, db.ForeignKey('materias_primas.id_materiaPrima'))
+    proveedor_id_proveedor = db.Column(db.Integer, db.ForeignKey('proveedor.id_proveedor'))
+    fecha_creacion = db.Column(db.DateTime, default=datetime.datetime.now)
+
+        
+    materia_prima = db.relationship('MateriasPrimas', backref='detalle_proveedor_materia')
+    proveedor = db.relationship('Proveedor', backref='detalle_proveedor_materia')
 class DetalleCompra(db.Model):
     id_detalleCompra = db.Column(db.Integer, primary_key=True)
     cantidad = db.Column(db.String(45))
@@ -80,6 +91,7 @@ class Receta(db.Model):
     nombre = db.Column(db.String(100))
     descripcion = db.Column(db.String(300))
     totalGalletas = db.Column(db.Integer)
+    tiempo = db.Column(db.Integer)
     precioTotal = db.Column(db.Float)
     tiempoHornear = db.Column(db.Integer)
     fecha_actualiza = db.Column(db.DateTime, default=datetime.datetime.now)

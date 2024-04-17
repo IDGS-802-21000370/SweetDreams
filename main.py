@@ -14,6 +14,7 @@ from blueprints.error.error import error_blueprint
 from blueprints.mermas.mermas import mermas_blueprint
 from blueprints.provedores.provedor import proveedor_blueprint
 from blueprints.compras.compra import compra_blueprint
+from blueprints.materia.materia import materiaprima_blueprint
 from blueprints.models import Usuario, db
 from flask_login import LoginManager, current_user
 from flask_admin import Admin, AdminIndexView
@@ -58,6 +59,7 @@ app.register_blueprint(error_blueprint)
 app.register_blueprint(mermas_blueprint)
 app.register_blueprint(proveedor_blueprint)
 app.register_blueprint(compra_blueprint)
+app.register_blueprint(materiaprima_blueprint)
 
 @app.errorhandler(404)
 def page_not_found(e):

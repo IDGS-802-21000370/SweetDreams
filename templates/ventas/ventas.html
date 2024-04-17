@@ -4,27 +4,27 @@
 <div class="container">
     <style>
         .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
-            background-color: rgb(0,0,0);
-            background-color: rgba(0,0,0,0.4);
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
         }
-   
+    
        
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto;
+            margin: 15% auto; 
             padding: 20px;
             border: 1px solid #888;
-            width: 80%;
+            width: 80%; 
         }
-   
+    
         .close {
             color: #aaa;
             float: right;
@@ -41,7 +41,6 @@
     </style>
     </head>
     <body>
-   
         <div id="myModal" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
@@ -53,7 +52,6 @@
                 <button id="hacerMasGalletas">Hacer más galletas</button>
             </div>
         </div>
-   
         <script>
             // Función para verificar si el modal ya se mostró antes
             function checkModal() {
@@ -63,24 +61,25 @@
                     localStorage.setItem('modalShown', 'true');
                 }
             }
-   
+    
             window.onload = checkModal;
-   
+    
             var modal = document.getElementById("myModal");
             var span = document.getElementsByClassName("close")[0];
             var hacerMasGalletasButton = document.getElementById("hacerMasGalletas");
-   
+    
             span.onclick = function() {
-                modal.style.display = "none";
+                modal.style.display = "none"; 
             }
-   
+    
             hacerMasGalletasButton.onclick = function() {
                 window.location.href = "/produccionGalleta";
             }
-   
+    
             window.onclick = function(event) {
                 if (event.target == modal) {
-                    modal.style.display = "none";
+                    modal.style.display = "none"; 
+
                 }
             }
         </script>

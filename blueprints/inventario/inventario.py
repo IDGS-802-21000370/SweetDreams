@@ -123,30 +123,30 @@ def inventario():
             else:
                 print("No se proporcionó un ID de galleta en la solicitud.")
         diccionario_productos = {
-        1: 658,
+        1: 658, 
         2: 1,
         3: 2,
- 
+
        
     }
         if request.form.get("accion") == "descuentar_producto":
-            id_materiaPrima = request.form.get("id_materiaPrima")
+            id_materiaPrima = request.form.get("id_materiaPrima") 
+
             if id_materiaPrima:
                 try:
                     with current_app.app_context():
                        
                         cantidad_a_descontar = diccionario_productos.get(int(id_materiaPrima), 0)
                         print("Cantidad a descontar:", cantidad_a_descontar)
- 
+
                         productoss = MateriasPrimas.query.get(id_materiaPrima)
                        
                         if productoss:
-                           
+                            
                             detalle = DetalleMateriaPrima.query.filter_by(
-                                materia_prima_id=id_materiaPrima,
+                                materia_prima_id=id_materiaPrima, 
                                 mermado=0
                             ).order_by(DetalleMateriaPrima.caducidad.asc()).first()
- 
                             if detalle:
                                 productoss.cantidad -= cantidad_a_descontar
                                
@@ -170,5 +170,4 @@ def inventario():
                     print(f"Error al descontar el producto: {e}")
             else:
                 print("No se proporcionó el ID del producto en la solicitud.")
-                
     return render_template("inventarios/inventario.html", galleta=galleta, materia_prima=materia_prima, productos_a_caducar=productos_a_caducar, productos_a_caducarg=productos_a_caducarg, materia_prima_hacer= materia_prima_hacer)
