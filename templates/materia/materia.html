@@ -1,0 +1,44 @@
+{% extends 'layoutPrincipal.html' %}
+{% from "_macros.html" import input_Form %}
+{% block content %}
+<form name="materia" action="" id="materia" method="post">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+<div class="container">
+    <div class="row">
+        <div class="row">
+            <div class="col-8">
+                <h2 class="titulos">Materia Primma</h2>
+            </div>
+            <div class="col-2">
+                <a href="/materiaForm" class="btn btn-success">Nueva Materia</a>
+            </div>
+            <div class="col-2">
+                <a href="/materiaEliminada" class="btn btn-primary">Materia Eliminada</a>
+            </div>
+        </div>
+        <table class="table table-striped table-bordered mt-4">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Tipo Medida</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {%for mtpm in Materias %}
+                <tr>
+                    <td>{{mtpm.nombre}}</td>
+                    <td>{{mtpm.cantidad}}</td>
+                    <td>{{mtpm.tipo_medida.descripcion}}</td>
+                    <td><button class="btn btn-danger" name="buttonMP" value="{{mtpm.id_materiaPrima}}" id="btnEliminarMP">Eliminar</button></td>
+                    <td><a href="/materiaUpdate?id={{mtpm.id_materiaPrima}}" class="btn btn-warning">Modificar</a></td>
+                </tr>
+                {%endfor%}
+            </tbody>
+        </table>
+    </div>
+</div>
+</form>
+{% endblock %}

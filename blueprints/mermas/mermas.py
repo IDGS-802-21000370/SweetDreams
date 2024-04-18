@@ -1,11 +1,19 @@
 from datetime import datetime, timedelta  # Importa la clase timedelta para manejar fechas
 from flask import Blueprint, current_app, render_template, request, redirect, url_for
 from sqlalchemy import and_
-from functools import wraps
 from flask_login import current_user
+from functools import wraps
 from blueprints.models import DetalleMateriaPrima, MateriasPrimas, Merma, db, DetalleGalleta, Galleta
 
 mermas_blueprint = Blueprint("mermas", __name__, template_folder="templates")
+def admin_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not current_user.is_authenticated:
+            # Redirigir a una página de acceso denegado o a la página principal
+            return render_template('404/404.html')
+        return func(*args, **kwargs)
+    return decorated_view
 
 def login_required(func):
     @wraps(func)

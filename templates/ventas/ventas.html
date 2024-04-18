@@ -3,37 +3,35 @@
 {% block content %}
 <div class="container">
     <style>
-        /* Estilos para el modal */
         .modal {
-            display: none; /* Por defecto, oculto */
-            position: fixed; /* Posición fija */
-            z-index: 1; /* Por encima de todo */
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto; /* Permite desplazamiento */
-            background-color: rgb(0,0,0); /* Fondo negro semitransparente */
-            background-color: rgba(0,0,0,0.4); /* Fondo negro semitransparente */
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
         }
     
-        /* Estilos para el contenido del modal */
+       
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto; /* Margen superior e inferior para centrar verticalmente */
+            margin: 15% auto; 
             padding: 20px;
             border: 1px solid #888;
-            width: 80%; /* Ancho del contenido del modal */
+            width: 80%; 
         }
     
-        /* Estilos para el botón de cerrar el modal */
         .close {
             color: #aaa;
             float: right;
             font-size: 28px;
             font-weight: bold;
         }
-    
+   
         .close:hover,
         .close:focus {
             color: black;
@@ -41,61 +39,54 @@
             cursor: pointer;
         }
     </style>
-    <!-- {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}" role="alert">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %} -->
-    </head> 
+    </head>
     <body>
-        <!-- Modal -->
         <div id="myModal" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
-                <!-- Contenido del modal -->
-                <h2>Productos a Punto de Caducar ¡URGENTE UTILIZAR!</h2>
-                <h3>Galletas por caducar:</h3>
+                <h2>¡URGENTE SE ESTAN TERMINANDO!</h2>
+                <h3>Galletas por terminar :</h3>
                 {% for producto in galletasc %}
                 {{ producto.nombre}}<br>
                 {% endfor %}
                 <button id="hacerMasGalletas">Hacer más galletas</button>
             </div>
         </div>
-        <!-- Script JavaScript para mostrar el modal automáticamente -->
         <script>
-            // Función para abrir el modal automáticamente al cargar la página
-            window.onload = function() {
-                document.getElementById("myModal").style.display = "block";
-            };
+            // Función para verificar si el modal ya se mostró antes
+            function checkModal() {
+                if (!localStorage.getItem('modalShown')) {
+                    var modal = document.getElementById("myModal");
+                    modal.style.display = "block";
+                    localStorage.setItem('modalShown', 'true');
+                }
+            }
     
-            // Seleccionar el modal, el botón para cerrarlo y el botón "Hacer más galletas"
+            window.onload = checkModal;
+    
             var modal = document.getElementById("myModal");
             var span = document.getElementsByClassName("close")[0];
             var hacerMasGalletasButton = document.getElementById("hacerMasGalletas");
     
-            // Cuando el usuario haga clic en <span> (x), cerrar el modal
             span.onclick = function() {
-                modal.style.display = "none"; // Ocultar el modal
+                modal.style.display = "none"; 
             }
     
-            // Cuando el usuario haga clic en el botón "Hacer más galletas", redireccionar a produccionGalleta.html
             hacerMasGalletasButton.onclick = function() {
                 window.location.href = "/produccionGalleta";
             }
     
-            // Cuando el usuario haga clic en cualquier lugar fuera del modal, cerrarlo
             window.onclick = function(event) {
                 if (event.target == modal) {
-                    modal.style.display = "none"; // Ocultar el modal
+                    modal.style.display = "none"; 
+
                 }
             }
         </script>
-  
     <form name="venta" action="/ventas" id="venta" method="POST">
+        <div id="boton-container">
+            <input type="button" onclick="openModalCaja()" id="imprimir" class="btn btn-success" name="imprimir" value="Abrir caja"/>
+        </div>
         <div class="hamburger-menu" onclick="toggleMenu()">
             <div class="line"></div>
             <div class="line"></div>
@@ -107,8 +98,12 @@
                 <li></li>
                 <li></li>
                 {% for item in menu_items %}
-                    <li>{{ item.nombre }} - ${{ item.precio }}</li>
+                    <li><h6>{{ item.nombre }} - ${{ item.precio }}</h6></li>
+                    <hr>
                 {% endfor %}
+                <li></li>
+                <input type="button"  onclick="openModalVenta()" class="btn btn-success product-btn" value="Realizar venta"/>
+                <input type="button" onclick="openModalVentaImpresion()" id="imprimir" class="btn btn-success product-btn" name="imprimir" value="Realizar venta e imprimir"/>
             </ul>
         </div>
 
@@ -126,14 +121,7 @@
                                     <input type="submit" id="agregarPieza" class="btn btn-success rounded-circle" name="agregarPieza" value="{{ galleta.id_galleta }}"/>
                                     <input type="submit" id="quitarPieza" class="btn btn-danger rounded-circle" name="quitarPieza" value="{{ galleta.id_galleta }}"/>
                                 </div>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Gramos ${{galleta.precioGramos}}
-                                <div class="d-flex align-items-center">
-                                    <input type="text" class="form-control form-control-sm" style="width: 50px;">
-                                    <input type="submit" id="agregarGramos" class="btn btn-success rounded-circle" name="agregarGramos" value="{{ galleta.id_galleta }}"/>
-                                </div>
-                            </li>                    
+                            </li>                   
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 700 Gm ${{galleta.precioPaquete1}}
                                 <div class="ml-auto">
@@ -155,6 +143,93 @@
                 {% endfor %}
             </div>
         </div>
+        <div id="modalVenta" class="modal-general">
+            <span onclick="closeModalVenta('modalVenta')" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
+            <h2>Total: ${{totalVenta}}</h2>
+            <h3>¿Quieres realizar la venta?</h3>
+            <input type="submit" id="vender" class="btn btn-success" name="vender" value="Realizar venta"/>
+            <input type="button"  onclick="closeModalVenta('modalVenta')" class="btn btn-danger" value="Cancelar"/>
+        </div>
+
+        <div id="modalVentaImpresion" class="modal-general">
+            <span onclick="closeModalVentaImpresion('modalVentaImpresion')" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
+            <h2>Total: ${{totalVenta}}</h2>
+            <h3>¿Quieres realizar la venta e imprimir el ticket?</h3>
+            <input type="submit" id="venderImprimir" class="btn btn-success" name="venderImprimir" value="Realizar venta"/>
+            <input type="button"  onclick="closeModalVentaImpresion('modalVentaImpresion')" class="btn btn-danger" value="Cancelar"/>
+        </div>
+        
+        <div id="modalVentaCaja" class="modal-general">
+            <input type="hidden" name="csrf_token" value="{{csrf_token()}}"/>
+            <span onclick="closeModalCaja('modalVentaCaja')" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
+            <h2>Ingresa la contraseña:</h2>
+            <input type="password" name="contrasenia" placeholder="Ingrese su contraseña">
+            <input type="submit" id="AceptarContrasenia" class="btn btn-success" name="AceptarContrasenia" value="Aceptar"/>
+        </div>
+
+        {% if modalAgregarGalleta %}
+        <div>
+            <div id="modal" class="modal-general" style="{% if modalAgregarGalleta %}display: block;{% else %}display: none;{% endif %}">
+                <span onclick="cerrarModal()" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
+                    <h3 style="color: rgb(255, 255, 0);">NOTIFICACIÓN</h3>
+                    <h5>Agrega productos a la venta</h5>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if modalVentaRealizada %}
+        <div>
+            <div id="modal" class="modal-general" style="{% if modalVentaRealizada %}display: block;{% else %}display: none;{% endif %}">
+                <span onclick="cerrarModal()" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
+                    <h3 style="color: rgb(0, 0, 0);">Venta realizada</h3>
+                    <h5>Se realizó la venta con éxito!!</h5>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if modalCajaValido %}
+        <div>
+            <div id="modal" class="modal-general" style="{% if modalCajaValido %}display: block;{% else %}display: none;{% endif %}">
+                <input type="hidden" name="csrf_token" value="{{csrf_token()}}"/>
+                <span onclick="cerrarModal()" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
+                <h3 style="color: rgb(0, 0, 0);">¿Cuanto dinero deseas retirar?</h3>
+                <input type="number" name="montoRetiro" placeholder="Ingrese el monto">
+                <input type="submit" id="retiro" class="btn btn-success" name="retiro" value="Retirar"/>
+                <input type="button" onclick="cerrarModal()" class="btn btn-danger" value="Cancelar"/>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if modalCajaInvalido %}
+        <div>
+            <div id="modal" class="modal-general" style="{% if modalCajaInvalido %}display: block;{% else %}display: none;{% endif %}">
+                <span onclick="cerrarModal()" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
+                    <h3 style="color: rgb(0, 0, 0);">Sin acceso</h3>
+                    <h5>Contraseña incorrecta</h5>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if modalSinDinero %}
+        <div>
+            <div id="modal" class="modal-general" style="{% if modalSinDinero %}display: block;{% else %}display: none;{% endif %}">
+                <span onclick="cerrarModal()" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
+                    <h3 style="color: rgb(0, 0, 0);">NOTIFICACIÓN</h3>
+                    <h5>No hay suficiente dinero en la caja</h5>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if modalRetiroExitoso %}
+        <div>
+            <div id="modal" class="modal-general" style="{% if modalRetiroExitoso %}display: block;{% else %}display: none;{% endif %}">
+                <span onclick="cerrarModal()" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
+                    <h3 style="color: rgb(0, 0, 0);">NOTIFICACIÓN</h3>
+                    <h5>Se retiro el dinero</h5>
+            </div>
+        </div>
+        {% endif %}
+    </div>
     </form>
 </div>
 

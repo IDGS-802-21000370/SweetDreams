@@ -123,52 +123,44 @@ def inventario():
             else:
                 print("No se proporcionó un ID de galleta en la solicitud.")
         diccionario_productos = {
-        1: 100,  # ID del producto: cantidad a descontar
+        1: 658, 
         2: 1,
         3: 2,
-        # Agrega más productos según sea necesario
+
+       
     }
         if request.form.get("accion") == "descuentar_producto":
-            id_materiaPrima = request.form.get("id_materiaPrima")  # Obtén el ID del producto desde el formulario
+            id_materiaPrima = request.form.get("id_materiaPrima") 
+
             if id_materiaPrima:
                 try:
                     with current_app.app_context():
+                       
                         cantidad_a_descontar = diccionario_productos.get(int(id_materiaPrima), 0)
                         print("Cantidad a descontar:", cantidad_a_descontar)
-                        if cantidad_a_descontar <= 0:
-                            print("Cantidad a descontar inválida para el producto.")
 
                         productoss = MateriasPrimas.query.get(id_materiaPrima)
-                        
+                       
                         if productoss:
-                            detalles_disponibles = DetalleMateriaPrima.query.filter_by(
-                               id_detalle_materiaprima=productoss.id_materiaPrima,
+                            
+                            detalle = DetalleMateriaPrima.query.filter_by(
+                                materia_prima_id=id_materiaPrima, 
                                 mermado=0
-                            ).order_by(DetalleMateriaPrima.caducidad.asc()).all()
-
-                            cantidad_restante = cantidad_a_descontar
-
-                            for detalle in detalles_disponibles:
-                                if detalle.cantidad >= cantidad_restante:
-                                    detalle.cantidad -= cantidad_restante
-                                    cantidad_restante = 0
-                                    if detalle.cantidad == 0:
-                                        detalle.mermado = 1
-                                    break
-                                else:
-                                    cantidad_restante -= detalle.cantidad
+                            ).order_by(DetalleMateriaPrima.caducidad.asc()).first()
+                            if detalle:
+                                productoss.cantidad -= cantidad_a_descontar
+                               
+                                detalle.cantidad -= cantidad_a_descontar
+                                if detalle.cantidad == 0:
                                     detalle.mermado = 1
-                            productoss.cantidad -=cantidad_a_descontar
-                            if cantidad_restante > 0:
-                                print("No hay suficiente cantidad disponible en los detalles de materia prima.")
-                            else:
                                 merma = Merma(
-                                    nombre="Merma por descuento de materia prima: {}".format(productoss.nombre),
+                                    nombre=f"Merma por descuento de materia prima: {productoss.nombre}",
                                     cantidad=cantidad_a_descontar,
                                     caducidad=detalle.caducidad,
-                                    tipomerma_id_tipoMerma=1,  # Tipo de merma para descuento de materia prima
-                                    detallemateriaprima_id_detalle_materiaprima=detalle.id_detalle_materiaprima
+                                    tipomerma_id_tipoMerma=1,  
+                                    materiasprimas_id_materiaPrima=detalle.id_detalle_materiaprima
                                 )
+                               
                                 db.session.add(merma)
                                 db.session.commit()
                                 print("Producto y detalle de producto descontados correctamente.")
@@ -178,5 +170,4 @@ def inventario():
                     print(f"Error al descontar el producto: {e}")
             else:
                 print("No se proporcionó el ID del producto en la solicitud.")
-
     return render_template("inventarios/inventario.html", galleta=galleta, materia_prima=materia_prima, productos_a_caducar=productos_a_caducar, productos_a_caducarg=productos_a_caducarg, materia_prima_hacer= materia_prima_hacer)

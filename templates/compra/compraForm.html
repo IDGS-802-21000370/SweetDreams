@@ -28,21 +28,22 @@
                             {{input_Form(formCompra.cantidad, class="form-control", type="number")}}
                         </div>
                         <div class="col">
-                            {{input_Form(formCompra.idTipoMedida, class="form-control")}}
+                            {{input_Form(formCompra.idProveedor, class="form-control", id="idProveedor")}}
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
-                            {{input_Form(formCompra.idMateriaPrima, class="form-control")}}
+                            {{input_Form(formCompra.idMateriaPrima, class="form-control", id="idMateriaPrima")}}
                         </div>
                         <div class="col">
-                            {{input_Form(formCompra.idProveedor, class="form-control")}}
+                            {{input_Form(formCompra.TipoMedida, class="form-control", id="inputMedida", readonly="readonly")}}
                         </div>
                     </div>
                 </div>
                 <div class="col d-flex justify-content-center">
                     <div class="d-flex align-self-end">
-                        <button class="btn btn-secondary" name="buttonMP" value="btnAgregarMP" id="btnAgregarMP">Agregar Materia</button>
+                        <button class="btn btn-secondary" name="buttonMP" value="btnAgregarMP" id="btnAgregarMP">Agregar
+                            Materia</button>
                     </div>
                 </div>
             </div>
@@ -73,17 +74,53 @@
                 </table>
             </div>
             <div class="col-1">
-                <button class="btn btn-secondary" type="submit" name="buttonMP" value="btnQuitarMP" id="btnQuitarMP">Quitar de Lista</button>
+                <button class="btn btn-secondary" type="submit" name="buttonMP" value="btnQuitarMP"
+                    id="btnQuitarMP">Quitar de Lista</button>
             </div>
             <div class="col-1">
-                <button class="btn btn-secondary" type="submit" name="buttonMP" value="btnLimpiarMP" id="btnLimpiarMP">Limpiar Lista</button>
+                <button class="btn btn-secondary" type="submit" name="buttonMP" value="btnLimpiarMP"
+                    id="btnLimpiarMP">Limpiar Lista</button>
             </div>
         </div>
         <div class="row mt-2">
             <div class="col d-flex justify-content-center">
-                <button class="btn btn-success" type="submit" name="buttonMP" value="btnRegistrarMP" id="btnRegistrarMP">Registrar</button>
+                <button class="btn btn-success" type="submit" name="buttonMP" value="btnRegistrarMP"
+                    id="btnRegistrarMP">Registrar</button>
             </div>
         </div>
     </div>
 </form>
+<script>
+    var pdm = JSON.parse('{{ pdm | tojson | safe }}');
+
+    function actualizarMateriasPrimas() {
+        var proveedorId = document.getElementById("idProveedor").value;
+        var materiaPrimaSelect = document.getElementById("idMateriaPrima");
+        materiaPrimaSelect.innerHTML = "";
+
+        pdm[proveedorId].forEach(function(materiaPrima) {
+            var option = document.createElement("option");
+            option.value = materiaPrima.id;
+            option.text = materiaPrima.nombre;
+            materiaPrimaSelect.appendChild(option);
+        });
+    }
+
+    function actualizarTipoMedida(){
+        var materiaPrimaId = document.getElementById("idMateriaPrima").value;
+        var materiasPrimasInfo = JSON.parse('{{ mpinfo | tojson | safe }}');
+        var descripcion = materiasPrimasInfo[materiaPrimaId] || '';
+        document.getElementById("inputMedida").value = descripcion
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        actualizarTipoMedida();
+        actualizarMateriasPrimas();
+        const materiaPrimaSelect = document.getElementById('idMateriaPrima');
+        materiaPrimaSelect.addEventListener('change', actualizarTipoMedida);
+        const proveedorSelect = document.getElementById('idProveedor');
+        proveedorSelect.addEventListener('change', actualizarMateriasPrimas);
+    });
+    
+</script>
 {% endblock %}

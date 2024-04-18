@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, url_for, redirect
 import blueprints.forms as forms
-from blueprints.models import Compra, DetalleCompra, Caja, CajaRetiro, DetalleMateriaPrima, MateriasPrimas, db
+from blueprints.models import Compra, DetalleCompra, Caja, CajaRetiro, DetalleMateriaPrima, MateriasPrimas, TipoMedidasMaterialPrimas, DetalleProveedorMateria, Proveedor, db
 from datetime import datetime
+from functools import wraps
 from flask_login import current_user
 from functools import wraps
 from flask_login import current_user
@@ -18,12 +19,22 @@ MPrima = []
 MPrimaTexto = []
 @compra_blueprint.route("/compras", methods=["GET", "POST"])
 @login_required
-def compraIndex():
-    compras = Compra.query.all()
-        
-    return render_template("compra/compra.html", Compra=compras)
+def obtener_mp_por_proveedor():
+    mp_por_proveedor = {}
+    proveedores = Proveedor.query.filter_by(estatus=1).all()
+    for proveedor in proveedores:
+        mp_por_proveedor[proveedor.id_proveedor] = []
+        materias_primas = DetalleProveedorMateria.query.filter_by(proveedor_id_proveedor=proveedor.id_proveedor).all()
+        for mp in materias_primas:
+            mp_por_proveedor[proveedor.id_proveedor].append({
+                'id': mp.materia_prima.id_materiaPrima,
+                'nombre': mp.materia_prima.nombre
+            })
+
+    return mp_por_proveedor
 
 @compra_blueprint.route("/detalleCompra", methods=["GET", "POST"])
+@login_required
 def detalleCompraIndex():
     if request.method=='GET':
         id=request.args.get('id')
@@ -32,16 +43,22 @@ def detalleCompraIndex():
     return render_template("compra/detalleCompra.html", dCompra=dCompras)
 
 @compra_blueprint.route("/compraForm", methods=["GET", "POST"])
+@login_required
 def compraForm():
     crpForm=forms.CompraForm(request.form)
     global MPrima
     global MPrimaTexto
-    
+    mapr = MateriasPrimas.query.filter_by(estatus=1).all()
+    mpinfo = {materia.id_materiaPrima: materia.tipo_medida.descripcion for materia in mapr}
+
+    tm = TipoMedidasMaterialPrimas.query.all()
+    tminfo = {tipo.descripcion: tipo.id_medida for tipo in tm}
+    pdm = obtener_mp_por_proveedor()
     if request.method=="POST":
         if request.form['buttonMP'] == "btnAgregarMP":
             cantidad=crpForm.cantidad.data
-            tipoMP_id = crpForm.idTipoMedida.data
-            tipoMP_valor = dict(crpForm.idTipoMedida.choices).get(tipoMP_id)
+            tipoMP_id = tminfo.get(crpForm.TipoMedida.data, '')
+            tipoMP_valor = crpForm.TipoMedida.data
             materiaprima_id = crpForm.idMateriaPrima.data
             materiaprima_valor = dict(crpForm.idMateriaPrima.choices).get(materiaprima_id)
             prvd_id = crpForm.idProveedor.data
@@ -61,6 +78,7 @@ def compraForm():
                            'prvd':prvd_valor
                            }
             )
+            crpForm.cantidad.data=None
 
         if request.form['buttonMP'] == "btnQuitarMP":
             indexEliminar = request.form.getlist('eliminar[]')
@@ -84,10 +102,8 @@ def compraForm():
                     print("No hay suficiente dinero en caja")
                 else:                    
                     #tabla compra
-                    #uid = current_user.id_usuario
-                    #prvd=Compra(totalCompra=crpForm.totalCompra.data, fecha_actualiza = datetime.now(), usuario_id_usuario = uid)
-                    prvd=Compra(totalCompra=crpForm.totalCompra.data, fecha_actualiza = datetime.now(), usuario_id_usuario = 1)
-                    #Cambiar id_usuario por id del usuario loggeado
+                    uid = current_user.id_usuario
+                    prvd=Compra(totalCompra=crpForm.totalCompra.data, fecha_actualiza = datetime.now(), usuario_id_usuario = uid)
                     db.session.add(prvd)
                     db.session.commit()
                     idCompra = db.session.query(db.func.max(Compra.id_compra)).scalar()
@@ -131,5 +147,7 @@ def compraForm():
                         
                     MPrima.clear()
                     MPrimaTexto.clear()
+                    return redirect(url_for('compras.compraIndex'))
 
-    return render_template("compra/compraForm.html", formCompra=crpForm, MPrima=MPrimaTexto)
+
+    return render_template("compra/compraForm.html", formCompra=crpForm, MPrima=MPrimaTexto, mpinfo=mpinfo, pdm=pdm)
