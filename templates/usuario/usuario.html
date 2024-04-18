@@ -29,7 +29,14 @@
                                     <h4 class="mt-1 mb-4 pb-1">Registro de usuario</h4>
                                 </div>
                                 <form method="POST" action="/usuario">
-                                    
+                                    <!-- <dialog id="alert">
+                                        <h2>Estas seguro que deseas eliminar el usuario? <span id="preEliminar"></span></h2>
+                                        <div>
+                                            <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+                                            <button type="button" id="eliminar" name="eliminar" value="eliminar" class="btn btn-primary" />
+                                        </div>
+                                    </dialog> -->
+
                                     <div class="form-outline mb-4">
                                         {{ input_Form(formUsuario.nombre, class="form-control", placeholder="Nombre") }}
                                     </div>
@@ -99,5 +106,6 @@
         </div>
     </div>
 </div>
+
 {% endblock %}
 

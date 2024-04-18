@@ -1,8 +1,20 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for
 import blueprints.forms as forms
-from blueprints.models import Galleta
+from blueprints.models import Galleta, Usuario
+from functools import wraps
+from flask_login import current_user
+from flask import flash
 
 venta_blueprint = Blueprint("ventas", __name__, template_folder="templates")
+
+def login_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return redirect(url_for('login.login'))
+        return func(*args, **kwargs)
+    return decorated_view
+
 quedan_galletas = {
     "Chispas de Chocolate": 15,  
     "Mantequilla": 10,              
@@ -17,6 +29,7 @@ quedan_galletas = {
 }
 menu_items = []
 @venta_blueprint.route("/ventas", methods=["GET", "POST"])
+@login_required
 def ventas():
     galletas=Galleta.query.all()
     galletasc = Galleta.query.filter(Galleta.cantidad < 10).all()

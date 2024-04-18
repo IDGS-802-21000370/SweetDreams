@@ -1,10 +1,20 @@
-from flask import Blueprint, current_app, jsonify, render_template, redirect, request
+from flask import Blueprint, current_app, jsonify, render_template, redirect, request, url_for
 from blueprints.produccion.produccionGalletas import Guardar
 from flask_sqlalchemy import SQLAlchemy
-
+from functools import wraps
+from flask_login import current_user
 produccion_blueprint = Blueprint("produccion", __name__, template_folder="templates")
 
+def login_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return redirect(url_for('login.login'))
+        return func(*args, **kwargs)
+    return decorated_view
+
 @produccion_blueprint.route("/produccionGalleta", methods=["GET", "POST"])
+@login_required
 def produccionGalletas():
     galletas_en_preparacion = []
     galletas_preparadas = []

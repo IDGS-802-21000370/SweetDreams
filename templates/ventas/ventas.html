@@ -41,9 +41,17 @@
             cursor: pointer;
         }
     </style>
+    <!-- {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %} -->
     </head> 
     <body>
-    
         <!-- Modal -->
         <div id="myModal" class="modal">
             <div class="modal-content">
@@ -57,7 +65,6 @@
                 <button id="hacerMasGalletas">Hacer más galletas</button>
             </div>
         </div>
-    
         <!-- Script JavaScript para mostrar el modal automáticamente -->
         <script>
             // Función para abrir el modal automáticamente al cargar la página
@@ -94,7 +101,7 @@
             <div class="line"></div>
             <div class="line"></div>
         </div>
-
+        
         <div id="menu" class="menu">
             <ul>
                 <li></li>

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, request, url_for
+from flask import Blueprint, render_template, redirect, request, url_for, current_app
 import blueprints.forms as forms
 from blueprints.models import Usuario, db
 import bcrypt
@@ -7,6 +7,8 @@ import re
 from functools import wraps
 from flask import redirect, url_for
 from flask_login import current_user
+import datetime as datetime
+import jwt
 
 usuario_blueprint = Blueprint("usuarios", __name__, template_folder="templates")
 
@@ -18,6 +20,7 @@ def admin_required(func):
             return redirect(url_for('login.login'))
         return func(*args, **kwargs)
     return decorated_view
+
 
 @usuario_blueprint.route("/usuario", methods=["GET", "POST"])
 @admin_required
@@ -82,6 +85,7 @@ def usuario():
                         password_hash = bcrypt.hashpw(nueva_contrasenia.encode('utf-8'), bcrypt.gensalt())
                         usuario_actualizar.contrasenia = password_hash
                     db.session.commit()
+                    flash('Usuario actualizado correctamente', 'success')
                 
             return redirect(url_for('usuarios.usuario'))
         elif 'eliminar' in request.form:

@@ -17,6 +17,8 @@ from blueprints.compras.compra import compra_blueprint
 from blueprints.models import Usuario, db
 from flask_login import LoginManager, current_user
 from flask_admin import Admin, AdminIndexView
+from flask import flash
+import logging
 
 app = Flask(__name__)
 csrf = CSRFProtect()
@@ -44,6 +46,10 @@ admin.init_app(app)
 def load_user(user_id):
     return db.session.get(Usuario, int(user_id))
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404/404.html'), 404
+
 app.register_blueprint(login_blueprint)
 app.config.from_object(DevelopmentConfig)
 app.register_blueprint(produccion_blueprint)
@@ -56,10 +62,6 @@ app.register_blueprint(error_blueprint)
 app.register_blueprint(mermas_blueprint)
 app.register_blueprint(proveedor_blueprint)
 app.register_blueprint(compra_blueprint)
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404/404.html'), 404
 
 if __name__ == "__main__":
     csrf.init_app(app)

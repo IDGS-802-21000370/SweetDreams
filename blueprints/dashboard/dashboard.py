@@ -1,14 +1,25 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, redirect, url_for
 from datetime import datetime, timedelta
 from sqlalchemy import func
 from blueprints.models import DetalleVentas, Galleta, TipoVenta, Venta, db
 import pandas as pd
 import plotly.express as px
 from plotly.io import to_html
+from functools import wraps
+from flask_login import current_user
 
 dashboard_blueprint = Blueprint("dashboard", __name__, template_folder="templates")
 
+def login_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return redirect(url_for('login.login'))
+        return func(*args, **kwargs)
+    return decorated_view
+
 @dashboard_blueprint.route("/dashboard", methods=["GET", "POST"])
+@login_required
 def dashboard():
     ventas_diarias = calcular_ventas_diarias()
     plot_html_ventas_diarias, plot_html_productos_vendidos, plot_html_ventas_tipo = generar_graficos(ventas_diarias)

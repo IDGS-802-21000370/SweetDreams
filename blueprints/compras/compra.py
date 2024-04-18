@@ -1,14 +1,23 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for
 import blueprints.forms as forms
 from blueprints.models import Compra, DetalleCompra, Caja, CajaRetiro, DetalleMateriaPrima, MateriasPrimas, db
 from datetime import datetime
 from flask_login import current_user
+from functools import wraps
+from flask_login import current_user
 
 compra_blueprint = Blueprint("compras", __name__, template_folder="templates")
-
+def login_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return redirect(url_for('login.login'))
+        return func(*args, **kwargs)
+    return decorated_view
 MPrima = []
 MPrimaTexto = []
 @compra_blueprint.route("/compras", methods=["GET", "POST"])
+@login_required
 def compraIndex():
     compras = Compra.query.all()
         
