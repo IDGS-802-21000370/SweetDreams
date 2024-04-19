@@ -1,6 +1,15 @@
 {% extends 'layoutPrincipal.html' %}
 {% from "_macros.html" import input_Form %}
 {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 <form name="proveedorForm" action="" id="proveedorForm" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     <div class="container">
@@ -9,15 +18,16 @@
                 <h2 class="titulos">Registro Compra</h2>
             </div>
             <div class="col-4 d-flex justify-content-center">
-                <a href="/compras" class="btn btn-primary">Regresar</a>
+                <button class="btn btn-primary" type="submit" name="buttonMP" value="btnRegresarMP" id="btnRegresarMP">Regresar</button>
             </div>
         </div>
         <div class="row mb-2 border rounded-1">
             <div class="col-3">
-                {{input_Form(formCompra.totalCompra, class="form-control")}}
+                <label for="Total">Total</label>
+                <input type="number" class="form-control" value="{{tCompra}}" id="Total" readonly="readonly">
             </div>
             <div class="col">
-                {{input_Form(formCompra.descripcion, class="form-control")}}
+                {{input_Form(crpForm.descripcion, class="form-control")}}
             </div>
         </div>
         <div class="row mb-2 border rounded-1">
@@ -25,18 +35,30 @@
                 <div class="col-8">
                     <div class="row">
                         <div class="col">
-                            {{input_Form(formCompra.cantidad, class="form-control", type="number")}}
+                            {{input_Form(crpForm.cantidad, class="form-control", type="number")}}
                         </div>
                         <div class="col">
-                            {{input_Form(formCompra.idProveedor, class="form-control", id="idProveedor")}}
+                            {{input_Form(crpForm.idProveedor, class="form-control", id="idProveedor")}}
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
-                            {{input_Form(formCompra.idMateriaPrima, class="form-control", id="idMateriaPrima")}}
+                            {{input_Form(crpForm.idMateriaPrima, class="form-control", id="idMateriaPrima")}}
                         </div>
                         <div class="col">
-                            {{input_Form(formCompra.TipoMedida, class="form-control", id="inputMedida", readonly="readonly")}}
+                            {{input_Form(crpForm.TipoMedida, class="form-control", id="inputMedida", readonly="readonly")}}
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="row">
+                        <div class="col">
+                            {{input_Form(crpForm.totalCompra, class="form-control")}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{input_Form(crpForm.fechaCaducidad, class="form-control")}}
                         </div>
                     </div>
                 </div>
@@ -58,6 +80,8 @@
                             <th>Materia Prima</th>
                             <th>Cantidad</th>
                             <th>Tipo Medida</th>
+                            <th>Precio</th>
+                            <th>Caducidad</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white">
@@ -68,6 +92,8 @@
                             <td>{{mp.materiaprima}}</td>
                             <td>{{mp.cantidad}}</td>
                             <td>{{mp.tipoMP}}</td>
+                            <td>{{mp.total}}</td>
+                            <td>{{mp.fechaCaducidad}}</td>
                         </tr>
                         {%endfor%}
                     </tbody>
@@ -79,18 +105,32 @@
             </div>
             <div class="col-1">
                 <button class="btn btn-secondary" type="submit" name="buttonMP" value="btnLimpiarMP"
-                    id="btnLimpiarMP">Limpiar Lista</button>
+                    id="btnLimpiarMP" onclick="return limpiarLista('limpiar')">Limpiar Lista</button>
             </div>
         </div>
         <div class="row mt-2">
             <div class="col d-flex justify-content-center">
                 <button class="btn btn-success" type="submit" name="buttonMP" value="btnRegistrarMP"
-                    id="btnRegistrarMP">Registrar</button>
+                    id="btnRegistrarMP" onclick="return confirmAction('registrar')">Registrar</button>
             </div>
         </div>
     </div>
 </form>
 <script>
+    function confirmAction(action) {
+        if (confirm("¿Estás seguro de que deseas " + action + " esta compra?")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    function limpiarLista(action) {
+        if (confirm("¿Estás seguro de que deseas " + action + " la lista de compra?")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     var pdm = JSON.parse('{{ pdm | tojson | safe }}');
 
     function actualizarMateriasPrimas() {
@@ -104,6 +144,7 @@
             option.text = materiaPrima.nombre;
             materiaPrimaSelect.appendChild(option);
         });
+        actualizarTipoMedida();
     }
 
     function actualizarTipoMedida(){
@@ -114,12 +155,14 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        actualizarTipoMedida();
         actualizarMateriasPrimas();
+        const proveedorSelect = document.getElementById('idProveedor');
+        proveedorSelect.addEventListener('change', function() {
+            actualizarMateriasPrimas();
+            actualizarTipoMedida();
+        });
         const materiaPrimaSelect = document.getElementById('idMateriaPrima');
         materiaPrimaSelect.addEventListener('change', actualizarTipoMedida);
-        const proveedorSelect = document.getElementById('idProveedor');
-        proveedorSelect.addEventListener('change', actualizarMateriasPrimas);
     });
     
 </script>

@@ -1,6 +1,15 @@
 {% extends 'layoutPrincipal.html' %}
 {% from "_macros.html" import input_Form %}
 {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 <form name="compra" action="" id="compra" method="post">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 <div class="container">
@@ -20,6 +29,7 @@
                     <th>Materia Prima</th>
                     <th>Cantidad</th>
                     <th>Tipo de Medida</th>
+                    <th>Precio Compra</th>
                 </tr>
             </thead>
             <tbody>
@@ -29,6 +39,7 @@
                     <td>{{dtCrp.materia_prima.nombre}}</td>
                     <td>{{dtCrp.cantidad}}</td>
                     <td>{{dtCrp.tipo_medida.descripcion}}</td>
+                    <td>{{dtCrp.precio}}</td>
                 </tr>
                 {%endfor%}
             </tbody>

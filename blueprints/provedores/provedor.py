@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, redirect, render_template, request, url_for, flash
 from blueprints.models import Proveedor, DetalleProveedorMateria, MateriasPrimas, db
 from blueprints.provedores import provedor
 import blueprints.forms as forms
@@ -9,23 +9,11 @@ proveedor_blueprint = Blueprint("provedores", __name__, template_folder="templat
 def admin_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
-        if not current_user.is_authenticated:
-            # Redirigir a una página de acceso denegado o a la página principal
-            return render_template('404/404.html')
-        return func(*args, **kwargs)
-    return decorated_view
-
-def admin_required(func):
-    @wraps(func)
-    def decorated_view(*args, **kwargs):
         if not current_user.is_authenticated or current_user.rol != 'admin':
             # Redirigir a una página de acceso denegado o a la página principal
             return redirect(url_for('login.login'))
         return func(*args, **kwargs)
     return decorated_view
-
-MPrima = []
-MPrimaTexto = []
 DPrima = []
 MPrimaM = []
 MPrimaTextoM = []
@@ -42,6 +30,7 @@ def proveedorIndex():
             prvd.estatus = 0
             db.session.add(prvd)
             db.session.commit()
+            flash('Proveedor eliminado.', 'warning') 
             return redirect(url_for('provedores.proveedorIndex'))
         
     return render_template("proveedor/proveedor.html", Proveedor=proveedores)
@@ -66,8 +55,7 @@ def prooveedorForm():
                            'materiaprima': materiaprima_valor, 
                            }
             )
-        print(MPrima)
-        print(MPrimaTexto)
+            
         if request.form['btnPrv'] == "btnQuitarPrv":
             indexEliminar = request.form.getlist('eliminar[]')
             indexEliminar = [int(index) for index in indexEliminar]
@@ -77,28 +65,40 @@ def prooveedorForm():
         materiaIds = [mp['materiaprima'] for mp in MPrima]
         materias_disponibles = MateriasPrimas.query.filter_by(estatus=1).filter(MateriasPrimas.id_materiaPrima.notin_(materiaIds)).all()
         prvdForm.materia.choices = [(mtr.id_materiaPrima, mtr.nombre) for mtr in materias_disponibles]
-
+        
         if request.form['btnPrv'] == "btnRegistrarPrv":
+            if not MPrimaM:
+                flash('Ingrese materias primas al proveedor.', 'warning')
+            else:
             #Alerta para registrar y checar que no haya datos repetidos en la tabla
-            prvd_form=forms.ProveedorForm(request.form)
-            prvd=Proveedor(nombreEmpresa=prvd_form.nombreEmpresa.data, direccion = prvd_form.direccion.data, contacto = prvd_form.contacto.data)
-            db.session.add(prvd)
-            db.session.commit()
+                prvd_form=forms.ProveedorForm(request.form)
+                nombreEmpresa=prvd_form.nombreEmpresa.data
+                proveedorExistente = Proveedor.query.filter_by(nombreEmpresa=nombreEmpresa).first()
+                if proveedorExistente:
+                    flash('El nombre del proveedor  ya existe. Por favor, elija otro nombre.', 'warning') 
+                else:
+                    prvd=Proveedor(nombreEmpresa=prvd_form.nombreEmpresa.data, direccion = prvd_form.direccion.data, contacto = prvd_form.contacto.data)
+                    db.session.add(prvd)
+                    db.session.commit()
 
-            idPrv = db.session.query(db.func.max(Proveedor.id_proveedor)).scalar()
-            for elemento in MPrima:
-                materiaprima_id = elemento['materiaprima']
-                    
-                detalle = DetalleProveedorMateria(materiasprimas_id_materiaPrima=materiaprima_id, proveedor_id_proveedor=idPrv)
-                db.session.add(detalle)
-                db.session.commit()
+                    idPrv = db.session.query(db.func.max(Proveedor.id_proveedor)).scalar()
+                    for elemento in MPrima:
+                        materiaprima_id = elemento['materiaprima']
                             
+                        detalle = DetalleProveedorMateria(materiasprimas_id_materiaPrima=materiaprima_id, proveedor_id_proveedor=idPrv)
+                        db.session.add(detalle)
+                        db.session.commit()
+                                    
+                    MPrima.clear()
+                    MPrimaTexto.clear()
+                    flash('Proveedor registrado.', 'warning')
+                    return redirect(url_for('provedores.proveedorIndex'))
+
+        if request.form['btnPrv'] == "btnRegresarPrv":
             MPrima.clear()
             MPrimaTexto.clear()
-
             return redirect(url_for('provedores.proveedorIndex'))
-
-            
+        
     return render_template("proveedor/proveedorForm.html", formProveedor=prvdForm, MPrima=MPrimaTexto)
 
 @proveedor_blueprint.route("/proveedoresUpdate", methods=["GET", "POST"])
@@ -157,8 +157,6 @@ def prooveedorUpdate():
             indice = [int(index) for index in indice]
             MPrimaM = [materiap for i, materiap in enumerate(MPrimaM, 1) if i not in indice]
             DPrima = [materiap for i, materiap in enumerate(DPrima, 1) if i not in indice]
-            print(MPrimaM)
-            print(DPrima)
             
         materiaS = [mpm['materiasprimas_id_materiaPrima'] for mpm in MPrimaM]
         materias_disponibles = MateriasPrimas.query.filter_by(estatus=1).filter(MateriasPrimas.id_materiaPrima.notin_(materiaS)).all()
@@ -166,39 +164,39 @@ def prooveedorUpdate():
 
         if request.form['btnPrvM'] == "btnModificarrPrv":
             #Alerta para editar
-            id=prvdForm.id.data
-            prvd=db.session.query(Proveedor).filter(Proveedor.id_proveedor==id).first()
-            prvd.nombreEmpresa=prvdForm.nombreEmpresa.data
-            prvd.direccion=prvdForm.direccion.data
-            prvd.contacto=prvdForm.contacto.data
-            db.session.add(prvd)
-            db.session.commit()
-            
-            detalleproveedor = DetalleProveedorMateria.query.filter_by(proveedor_id_proveedor=id).all()
-    
-            # Actualizar los detalles existentes y agregar los nuevos
-            for detalle in detalleproveedor:
-                mtrid = detalle.materiasprimas_id_materiaPrima
+            if not MPrimaM:
+                flash('Ingrese materias primas o elimine proveedor.', 'warning')
+            else:
+                id=prvdForm.id.data
+                prvd=db.session.query(Proveedor).filter(Proveedor.id_proveedor==id).first()
+                prvd.nombreEmpresa=prvdForm.nombreEmpresa.data
+                prvd.direccion=prvdForm.direccion.data
+                prvd.contacto=prvdForm.contacto.data
+                db.session.add(prvd)
+                db.session.commit()
                 
-                # Si el detalle existe en la lista DPrima, establecer su estatus como 1
-                if any(mtrid == elemento['materiasprimas_id_materiaPrima'] for elemento in DPrima):
-                    detalle.estatus = 1
-                    db.session.commit()
-                # Si el detalle no existe en la lista DPrima, establecer su estatus como 0
-                else:
-                    detalle.estatus = 0
-                    db.session.commit()
-            
-            # Agregar nuevos detalles de materia prima que no están en los detalles del proveedor
-            for elemento in DPrima:
-                mtrid = elemento['materiasprimas_id_materiaPrima']
+                detalleproveedor = DetalleProveedorMateria.query.filter_by(proveedor_id_proveedor=id).all()
+                # Actualizar los detalles existentes y agregar los nuevos
+                for detalle in detalleproveedor:
+                    mtrid = detalle.materiasprimas_id_materiaPrima
+                    
+                    # Si el detalle existe en la lista DPrima, establecer su estatus como 1
+                    if any(mtrid == elemento['materiasprimas_id_materiaPrima'] for elemento in DPrima):
+                        detalle.estatus = 1
+                        db.session.commit()
+                    else:
+                        detalle.estatus = 0
+                        db.session.commit()
                 
-                # Si el detalle no existe en los detalles del proveedor, agregarlo con estatus 1
-                if not any(mtrid == detalle.materiasprimas_id_materiaPrima for detalle in detalleproveedor):
-                    detalle = DetalleProveedorMateria(materiasprimas_id_materiaPrima=mtrid, proveedor_id_proveedor=id)
-                    db.session.add(detalle)
-                    db.session.commit()
-            return redirect(url_for('provedores.proveedorIndex'))
+                # Agregar nuevos detalles de materia prima que no están en los detalles del proveedor
+                for elemento in DPrima:
+                    mtrid = elemento['materiasprimas_id_materiaPrima']
+                    if not any(mtrid == detalle.materiasprimas_id_materiaPrima for detalle in detalleproveedor):
+                        detalle = DetalleProveedorMateria(materiasprimas_id_materiaPrima=mtrid, proveedor_id_proveedor=id)
+                        db.session.add(detalle)
+                        db.session.commit()
+                flash('Proveedor actualizado.', 'warning') 
+                return redirect(url_for('provedores.proveedorIndex'))
                 
     return render_template("proveedor/proveedorM.html", formProveedor=prvdForm,MPrimaM=MPrimaM)
 
@@ -215,6 +213,7 @@ def proveedorEliminado():
             prvd.estatus = 1
             db.session.add(prvd)
             db.session.commit()
+            flash('Proveedor restaurado.', 'warning') 
             return redirect(url_for('provedores.proveedorEliminado'))
         
     return render_template("proveedor/proveedorE.html", Proveedor=proveedores)

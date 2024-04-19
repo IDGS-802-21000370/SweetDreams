@@ -1,19 +1,28 @@
 {% extends 'layoutPrincipal.html' %}
 {% from "_macros.html" import input_Form %}
 {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 <form name="proveedorForm" action="" id="proveedorForm" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     <div class="container">
-        <div class="row mb-4">
+        <div class="row mb-3">
             <div class="col-8">
                 <h2 class="titulos">Nuevo Proveedor</h2>
             </div>
             <div class="col-4 d-flex justify-content-center">
-                <a href="/proveedores" class="btn btn-primary">Regresar</a>
+                <button class="btn btn-primary" type="submit" name="btnPrv" value="btnRegresarPrv" id="btnRegresarPrv">Regresar</button>
             </div>
         </div>
         <div class="col-7">
-            <div class="row mb-2">
+            <div class="row mb-1">
                 <div class="col">
                     {{input_Form(formProveedor.nombreEmpresa, class="form-control")}}
                 </div>
@@ -55,28 +64,33 @@
                     </div>
                     <div class="row">
                         <div class="col">
-                            <div class="row m-4">
-                                <button class="btn btn-secondary" type="submit" name="btnPrv" value="btnAgregarPrv"id="btnAgregarPrv">Agregar</button>
+                            <div class="row m-3">
+                                {% if formProveedor.materia.choices %}
+                                    <button class="btn btn-secondary" name="btnPrv" value="btnAgregarPrv" id="btnAgregarPrv">Agregar Materia</button>
+                                {% else %}
+                                    <button class="btn btn-secondary" disabled>Agregar Materia</button>
+                                {% endif %}
                             </div>
-                            <div class="row m-4">
-                                <button class="btn btn-secondary" type="submit" name="btnPrv" value="btnQuitarPrv"id="btnQuitarPrv">Quitar</button>
+                            <div class="row m-3">
+                                <button class="btn btn-secondary" type="submit" name="btnPrv" value="btnQuitarPrv" id="btnQuitarPrv">Quitar</button>
+                            </div>
+                            <div class="row m-3">
+                                <button class="btn btn-success" type="submit" name="btnPrv" value="btnRegistrarPrv" id="btnRegistrarPrv" onclick="return confirmAction('registrar')">Registrar</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
-               
-            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-8 d-flex justify-content-center">
- 
-            <button class="btn btn-success" type="submit" name="btnPrv" value="btnRegistrarPrv"
-                id="btnRegistrarPrv">Registrar</button>
-        </div>
-    </div>
     </div>
 </form>
+<script>
+    function confirmAction(action) {
+        if (confirm("¿Estás seguro de que deseas " + action + " este proveedor?")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+</script>
 {% endblock %}

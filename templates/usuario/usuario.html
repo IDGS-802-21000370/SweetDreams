@@ -7,6 +7,25 @@
         border-top: 1px solid #eee; /* Opcional: añade una línea divisoria */
         margin-top: -20px; /* Ajusta según sea necesario para acercar */
     }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 40%;
+    }
 </style>
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -29,7 +48,22 @@
                                     <h4 class="mt-1 mb-4 pb-1">Registro de usuario</h4>
                                 </div>
                                 <form method="POST" action="/usuario">
-                                    
+                                    <div id="deleteModal" class="modal">
+                                        <div class="modal-content">
+                                            <span>¿Estás seguro de que quieres eliminar este usuario?</span>
+                                            <form method="POST" action="/usuario">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                                <input type="hidden" id="userIdToDelete" name="eliminar" value="" />
+                                                <div class="d-flex justify-content-between">
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        Eliminar
+                                                    </button>
+                                                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
                                     <div class="form-outline mb-4">
                                         {{ input_Form(formUsuario.nombre, class="form-control", placeholder="Nombre") }}
                                     </div>
@@ -81,7 +115,10 @@
                                                     <button type="submit" name="accion" value="editar_{{ usuario.id_usuario }}" class="btn btn-sm btn-warning">
                                                         <i class="bi bi-pencil-square"></i>
                                                     </button>
-                                                    <button type="submit" name="eliminar" value="{{ usuario.id_usuario }}" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar este usuario?')">
+                                                    <!-- <button type="submit" name="eliminar" value="{{ usuario.id_usuario }}" class="btn btn-sm btn-primary">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </button> -->
+                                                    <button type="button" class="btn btn-sm btn-danger" data-user-id="{{ usuario.id_usuario }}" onclick="openDeleteModal(this)">
                                                         <i class="bi bi-trash-fill"></i>
                                                     </button>
                                                 </td>
@@ -90,7 +127,6 @@
                                         </tbody>
                                     </table>
                                 </form>
-                                
                             </div>
                         </div>
                     </div>
@@ -99,5 +135,25 @@
         </div>
     </div>
 </div>
+<script>
+    console.log("dentro del script")
+    function openDeleteModal(button) {
+    var userId = button.getAttribute('data-user-id');
+    var modal = document.getElementById('deleteModal');
+    document.getElementById('userIdToDelete').value = userId;
+    modal.style.display = 'block';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        function closeModal() {
+            var modal = document.getElementById('deleteModal');
+            modal.style.display = 'none';
+        }
+
+        var cancelButton = document.querySelector(".btn-secondary");
+        cancelButton.addEventListener('click', closeModal);
+    });
+    
+</script>
 {% endblock %}
 

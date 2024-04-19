@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, render_template, request, url_for, redirect
+from flask import Flask, Blueprint, render_template, request, url_for, redirect, jsonify, current_app
 import blueprints.forms as forms
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_admin import Admin
@@ -9,6 +9,8 @@ import bcrypt
 from flask import flash
 import logging
 from datetime import datetime
+from functools import wraps
+import jwt
 
 login_blueprint = Blueprint("login", __name__, template_folder="templates")
 
@@ -22,11 +24,12 @@ def login():
         nombreUsuario = formLogin.usuario.data
         contrasenia = formLogin.contrasenia.data.encode('utf-8')  
         user = Usuario.query.filter_by(nombreUsuario=nombreUsuario).first()
-        #if user and user.contrasenia:
+        
         if user:
             if user.intentos < 3:
-                #if bcrypt.checkpw(contrasenia, user.contrasenia.encode('utf-8')):
-                if user and user.contrasenia:
+                #if user and user.contrasenia:
+                if bcrypt.checkpw(contrasenia, user.contrasenia.encode('utf-8')):
+                #if user and user.contrasenia:
                     if user.estatus == 1:
                         user.intentos = 0
                         user.ultimo_inicio_sesion = datetime.now()
@@ -37,6 +40,16 @@ def login():
                             return redirect(url_for('admin.index'))
                         elif user.rol == 'usuario':
                             return redirect(url_for('admin.index'))
+                        """ if request.method == "GET":
+                            if current_user.is_authenticated:
+                                last_login = current_user.ultimo_inicio_sesion
+                                if last_login:
+                                    flash(f'Tu último inicio de sesión fue: {last_login.strftime("%Y-%m-%d %H:%M:%S")}', 'info')
+                                else:
+                                    flash('Este es tu primer inicio de sesión.', 'info') """
+                        """ user.ultimo_inicio_sesion = datetime.now()
+                        db.session.commit() """
+
                     else:
                         flash('El usuario no está activado', 'warning')
                         logging.warning(f'Intento de inicio de sesión fallido para el usuario desactivado: {nombreUsuario}')
@@ -46,7 +59,7 @@ def login():
                     flash('Nombre de usuario o contraseña incorrecta.', 'warning')
                     logging.warning(f'Intento de inicio de sesión fallido para el usuario: {nombreUsuario}')
             else:
-                user.estatus = 0  # Bloquear usuario
+                user.estatus = 0
                 db.session.commit()
                 flash('Este usuario ha sido bloqueado por intentos fallidos', 'warning')
         else:
@@ -62,5 +75,3 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('login.login'))
-
- 
