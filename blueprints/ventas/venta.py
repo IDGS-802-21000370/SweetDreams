@@ -1,6 +1,6 @@
 import datetime
 import os
-from flask import Blueprint, render_template, request
+from flask import Blueprint, flash, render_template, request
 import blueprints.forms as forms
 from blueprints.models import Caja, DetalleVentas, Galleta, Venta, db
 import subprocess
@@ -96,33 +96,41 @@ def ventas():
             if totalVenta == 0:
                 return render_template('ventas/ventas.html', galletas=galletas, modalAgregarGalleta=True)
             else:
-                venta = Venta( total = totalVenta,
-                               caja_id_caja = 1,
-                               usuario_id_usuario = 1)
-                db.session.add(venta)
-                db.session.commit()
-
-                ventaID = Venta.query.order_by(Venta.id_venta.desc()).limit(1).first()
-                for detalle in menu_items:
-                    detalleVenta = DetalleVentas(cantidad = detalle['cantidad'],
-                                                venta_id_venta = ventaID.id_venta,
-                                                tipoventa_id_tipoVenta = detalle['tipoVenta'],
-                                                galleta_id_galleta = detalle['id_galleta'])
-                    db.session.add(detalleVenta)
-                    db.session.commit()
-                caja = Caja.query.filter_by(id_caja=1).first()
-                dineroTotalCaja = caja.dineroTotal + totalVenta
-                caja.dineroTotal = dineroTotalCaja
-                caja.fecha_creacion = datetime.datetime.now()
-                db.session.commit()
-
+                galletasVerificar=Galleta.query.all()
+            for g in galletasVerificar:
                 for item in menu_items:
-                    galletaRestada = Galleta.query.filter_by(id_galleta=item['id_galleta']).first()
-                    cantidadRestante = galletaRestada.cantidad - item['cantidad']
-                    galletaRestada.cantidad = cantidadRestante
-                    db.session.commit()
-                menu_items.clear()
-                return render_template('ventas/ventas.html', galletas=galletas, totalVenta=totalVenta, modalVentaRealizada=True)
+                    if item['id_galleta'] == g.id_galleta and g.cantidad < item['cantidad']:
+                        flash("No hay suficientes galletas de "+item['nombre'])
+                        return render_template('ventas/ventas.html', galletas=galletas, totalVenta=totalVenta) 
+                    else:
+                        print("si hay galletas")
+            venta = Venta( total = totalVenta,
+                        caja_id_caja = 1,
+                        usuario_id_usuario = 1)
+            db.session.add(venta)
+            db.session.commit()
+
+            ventaID = Venta.query.order_by(Venta.id_venta.desc()).limit(1).first()
+            for detalle in menu_items:
+                detalleVenta = DetalleVentas(cantidad = detalle['cantidad'],
+                                            venta_id_venta = ventaID.id_venta,
+                                            tipoventa_id_tipoVenta = detalle['tipoVenta'],
+                                            galleta_id_galleta = detalle['id_galleta'])
+                db.session.add(detalleVenta)
+                db.session.commit()
+            caja = Caja.query.filter_by(id_caja=1).first()
+            dineroTotalCaja = caja.dineroTotal + totalVenta
+            caja.dineroTotal = dineroTotalCaja
+            caja.fecha_creacion = datetime.datetime.now()
+            db.session.commit()
+
+            for item in menu_items:
+                galletaRestada = Galleta.query.filter_by(id_galleta=item['id_galleta']).first()
+                cantidadRestante = galletaRestada.cantidad - item['cantidad']
+                galletaRestada.cantidad = cantidadRestante
+                db.session.commit()
+            menu_items.clear()
+            return render_template('ventas/ventas.html', galletas=galletas, totalVenta=totalVenta, modalVentaRealizada=True)
         if 'quitarPieza' in request.form or 'quitarPaq1' in request.form or 'quitarPaq2' in request.form:
             if 'quitarPieza' in request.form:
                 galletaAgregada=Galleta.query.filter_by(id_galleta=int(request.form['quitarPieza'])).first()

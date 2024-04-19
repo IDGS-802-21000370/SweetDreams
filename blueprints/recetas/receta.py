@@ -1,7 +1,7 @@
 import base64
 import datetime
 import os
-from flask import Blueprint, render_template, request
+from flask import Blueprint, flash, render_template, request
 import blueprints.forms as forms
 from blueprints.models import DetalleReceta, Galleta, MateriasPrimas, Receta, TipoMedidasMaterialPrimas, db
 from  functools import wraps
@@ -38,15 +38,26 @@ def recetas():
         tipoMedida = request.form['tipoMedidaMateriaPrima']
         
         if 'registrar' in request.form:
-            """  for elemento in materiasPrimas:
-                    if elemento.nombre in receta:
-                        print(f"{elemento} está presente en ambas listas.")
-                    else:
-                        print(f"{elemento} no está presente en lista2.") """
             if cantidad == '':
                 return render_template("recetas/recetas.html", formReceta = formReceta, materiasPrimas=materiasPrimas, tipoMedidaMateriaPrima=tipoMedidaMateriaPrima, modal_cantidad=True)
             else:    
                 materiaPrima = MateriasPrimas.query.filter_by(id_materiaPrima=int(ingrediente)).all()
+                with open("recetas.txt", "r",  encoding="utf-8") as file:
+                    recetas = file.readlines()
+                lista_diccionarios = []
+                for cadena in recetas:
+                    pares = cadena.strip().split(', ')
+                    diccionario = {}
+                    for par in pares:
+                        clave, valor = par.split(': ')
+                        diccionario[clave] = valor
+                    lista_diccionarios.append(diccionario)
+                for elegido in lista_diccionarios:
+                    if materiaPrima[0].nombre == elegido['ingrediente']:
+                        flash("El ingrediente ya esta en la receta")
+                        return render_template("recetas/recetas.html", formReceta = formReceta, materiasPrimas=materiasPrimas, tipoMedidaMateriaPrima=tipoMedidaMateriaPrima)
+                    else:
+                        print(f"Prosigue la receta")
                 ingrediente = materiaPrima[0].nombre
                 tipoMedida = tipo_medida_map.get(tipoMedida, '')
                 global contador_recetas
@@ -110,7 +121,8 @@ def recetas():
                 if request.form['id_receta'] != '' and request.form['id_receta'] != 'None':
                     return render_template("recetas/recetas.html", formReceta=formReceta, materiasPrimas=materiasPrimas, tipoMedidaMateriaPrima=tipoMedidaMateriaPrima, mostrar_modal=True, id_re=request.form['id_receta'])
                 else:
-                    
+                    archivo = request.files['file']
+                    ruta_archivo = archivo.filename
 
                     receta = Receta(nombre=formReceta.nombreReceta.data,
                                 descripcion=formReceta.descripcion.data,
@@ -136,7 +148,7 @@ def recetas():
                                             precioGramos = 0,
                                             precioPaquete1 = precioPaquete1,
                                             precioPaquete2 = precioPaquete2,
-                                            imagen = "",
+                                            imagen = ruta_archivo,
                                             receta_id_receta = ultimaReceta.id_receta
                                             )
                     db.session.add(insertarGalleta)

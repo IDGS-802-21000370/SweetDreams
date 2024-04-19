@@ -2,6 +2,15 @@
 {% from "_macros.html" import input_Form %}
 {% block content %}
 <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+        {% endif %}
+    {% endwith %}
     <form name="receta" action="/recetas" id="receta" method="POST" enctype="multipart/form-data">
         <div class="row">
             <h2 class="titulos">Recetas</h2>
@@ -54,7 +63,7 @@
                                 {{input_Form(formReceta.tiempoHornear, class="form-control", type="number")}} 
                             </div>
                             <div class="col">
-                                <label class="form-label">Peso por galleta</label>
+                                <label class="form-label">Peso por galleta en gramos</label>
                                 <input type="text" id="pesajeGramos" name="pesajeGramos" class="form-control">
                             </div>
                         </div>                            
