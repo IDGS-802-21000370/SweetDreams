@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, current_app, flash, jsonify, render_template, redirect, request
+from flask import Blueprint, current_app, flash, jsonify, render_template, redirect, request, url_for
 from blueprints.models import DetalleGalleta, DetalleReceta, Galleta, MateriasPrimas, Receta
 from blueprints.produccion.produccionGalletas import Guardar
 from flask_sqlalchemy import SQLAlchemy

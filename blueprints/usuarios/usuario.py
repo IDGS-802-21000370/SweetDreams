@@ -70,7 +70,7 @@ def usuario():
             es_segura, mensaje = validar_contraseña_segura(contraseña_ingresada)
             if not es_segura:
                 flash(mensaje, 'warning')
-            elif not validar_contraseña_unicidad_bd(contraseña_ingresada):
+            #elif not validar_contraseña_unicidad_bd(contraseña_ingresada):
                 flash('La contraseña ingresada ya está en uso.', 'warning')
             elif not validar_contraseña_unicidad_txt(contraseña_ingresada):
                 flash('La contraseña ingresada no es segura.', 'warning')

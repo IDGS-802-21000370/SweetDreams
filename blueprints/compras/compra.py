@@ -138,9 +138,9 @@ def compraForm():
                         materiaprima_id = elemento['materiaprima']
                         prvd_id = elemento['prvd']
                         fechaCaducidad = elemento['fechaCaducidad']
-                        precio = elemento['totalCompra']
+                        precio = elemento['total']
                 
-                        detalle = DetalleCompra(cantidad=cantidad, tipomedidasmaterialprimas_id_medida=tipoMP_id, 
+                        detalle = DetalleCompra(cantidad=cantidad, tipomedidasmaterialprimas_id_medida=tipoMP_id, precio=precio,
                                                 compra_id_compra=idCompra, materiasprimas_id_materiaPrima=materiaprima_id, 
                                                 proveedor_id_proveedor=prvd_id)
                         db.session.add(detalle)
