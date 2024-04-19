@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, redirect, url_for
 from datetime import datetime, timedelta
 from sqlalchemy import func
 from blueprints.models import DetalleVentas, Galleta, TipoVenta, Venta, db
@@ -18,8 +18,16 @@ def admin_required(func):
         return func(*args, **kwargs)
     return decorated_view
 
+def login_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return redirect(url_for('login.login'))
+        return func(*args, **kwargs)
+    return decorated_view
+
 @dashboard_blueprint.route("/dashboard", methods=["GET", "POST"])
-@admin_required
+@login_required
 def dashboard():
     ventas_diarias = calcular_ventas_diarias()
     plot_html_ventas_diarias, plot_html_productos_vendidos, plot_html_ventas_tipo = generar_graficos(ventas_diarias)

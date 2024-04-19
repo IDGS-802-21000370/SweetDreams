@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta  # Importa la clase timedelta para manejar fechas
-from flask import Blueprint, current_app, render_template, request
+from flask import Blueprint, current_app, render_template, request, redirect, url_for
 from sqlalchemy import and_
 from flask_login import current_user
 from functools import wraps
-
 from blueprints.models import DetalleMateriaPrima, MateriasPrimas, Merma, db, DetalleGalleta, Galleta
 
 mermas_blueprint = Blueprint("mermas", __name__, template_folder="templates")
@@ -16,8 +15,16 @@ def admin_required(func):
         return func(*args, **kwargs)
     return decorated_view
 
+def login_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return redirect(url_for('login.login'))
+        return func(*args, **kwargs)
+    return decorated_view
+
 @mermas_blueprint.route("/mermas", methods=["GET", "POST"])
-@admin_required
+@login_required
 def mermas():
     try:
         with current_app.app_context():

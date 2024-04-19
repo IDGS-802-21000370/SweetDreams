@@ -14,9 +14,6 @@ def admin_required(func):
             return redirect(url_for('login.login'))
         return func(*args, **kwargs)
     return decorated_view
-
-MPrima = []
-MPrimaTexto = []
 DPrima = []
 MPrimaM = []
 MPrimaTextoM = []

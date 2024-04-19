@@ -1,25 +1,26 @@
 import base64
 import datetime
 import os
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for
 import blueprints.forms as forms
+from blueprints.models import DetalleReceta, MateriasPrimas, Receta, TipoMedidasMaterialPrimas, db
+from functools import wraps
 from blueprints.models import DetalleReceta, Galleta, MateriasPrimas, Receta, TipoMedidasMaterialPrimas, db
 from  functools import wraps
 from flask_login import current_user
 
 recetas_blueprint = Blueprint("recetas", __name__, template_folder="templates")
-def admin_required(func):
+def login_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
         if not current_user.is_authenticated:
-            # Redirigir a una página de acceso denegado o a la página principal
-            return render_template('404/404.html')
+            return redirect(url_for('login.login'))
         return func(*args, **kwargs)
     return decorated_view
 
 contador_recetas = 0
 @recetas_blueprint.route("/recetas", methods=["GET", "POST"])
-@admin_required
+@login_required
 def recetas():
     formReceta=forms.RecetaForm(request.form)
     materiasPrimas=MateriasPrimas.query.all()

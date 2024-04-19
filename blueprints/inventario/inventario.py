@@ -1,25 +1,25 @@
 from datetime import datetime, timedelta
-from flask import Blueprint, current_app, render_template, request
+from flask import Blueprint, current_app, render_template, request, redirect, url_for
 from sqlalchemy import func
 import blueprints.forms as forms
 from blueprints.models import Galleta, MateriasPrimas, Merma
 from blueprints.mermas.mermas_copy import merma
-from blueprints.models import DetalleGalleta, DetalleMateriaPrima,db
-from flask_login import current_user
 from functools import wraps
+from flask_login import current_user
 
 inventario_blueprint = Blueprint("inventario", __name__, template_folder="templates")
-def admin_required(func):
+
+from blueprints.models import DetalleGalleta, DetalleMateriaPrima,db
+def login_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
         if not current_user.is_authenticated:
-            # Redirigir a una página de acceso denegado o a la página principal
-            return render_template('404/404.html')
+            return redirect(url_for('login.login'))
         return func(*args, **kwargs)
     return decorated_view
 
 @inventario_blueprint.route("/inventario", methods=["GET", "POST"])
-@admin_required
+@login_required
 def inventario():
     tipo_medida_map = {
         '1': 'Gramos',

@@ -4,17 +4,21 @@ from blueprints.models import Compra, DetalleCompra, Caja, CajaRetiro, DetalleMa
 from datetime import datetime
 from functools import wraps
 from flask_login import current_user
+from functools import wraps
+from flask_login import current_user
 
 compra_blueprint = Blueprint("compras", __name__, template_folder="templates")
-def admin_required(func):
+def login_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
         if not current_user.is_authenticated:
-            # Redirigir a una página de acceso denegado o a la página principal
             return redirect(url_for('login.login'))
         return func(*args, **kwargs)
     return decorated_view
-
+MPrima = []
+MPrimaTexto = []
+@compra_blueprint.route("/compras", methods=["GET", "POST"])
+@login_required
 def obtener_mp_por_proveedor():
     mp_por_proveedor = {}
     proveedores = Proveedor.query.filter_by(estatus=1).all()
@@ -29,17 +33,8 @@ def obtener_mp_por_proveedor():
 
     return mp_por_proveedor
 
-MPrima = []
-MPrimaTexto = []
-@compra_blueprint.route("/compras", methods=["GET", "POST"])
-@admin_required
-def compraIndex():
-    compras = Compra.query.all()
-        
-    return render_template("compra/compra.html", Compra=compras)
-
 @compra_blueprint.route("/detalleCompra", methods=["GET", "POST"])
-@admin_required
+@login_required
 def detalleCompraIndex():
     if request.method=='GET':
         id=request.args.get('id')
@@ -48,7 +43,7 @@ def detalleCompraIndex():
     return render_template("compra/detalleCompra.html", dCompra=dCompras)
 
 @compra_blueprint.route("/compraForm", methods=["GET", "POST"])
-@admin_required
+@login_required
 def compraForm():
     crpForm=forms.CompraForm(request.form)
     global MPrima
