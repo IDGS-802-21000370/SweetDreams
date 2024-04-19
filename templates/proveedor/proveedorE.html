@@ -1,6 +1,15 @@
 {% extends 'layoutPrincipal.html' %}
 {% from "_macros.html" import input_Form %}
 {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 <form name="proveedor" action="" id="proveedor" method="post">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 <div class="container">
@@ -28,7 +37,7 @@
                     <td>{{prvd.nombreEmpresa}}</td>
                     <td>{{prvd.direccion}}</td>
                     <td>{{prvd.contacto}}</td>
-                    <td><button class="btn btn-warning" name="buttonP" value="{{prvd.id_proveedor}}" id="btnRestaurarP">Restaurar</button></td>
+                    <td><button class="btn btn-warning" name="buttonP" value="{{prvd.id_proveedor}}" id="btnRestaurarP" onclick="return confirmAction('restaurar')">Restaurar</button></td>
                 </tr>
                 {%endfor%}
             </tbody>
@@ -36,4 +45,13 @@
     </div>
 </div>
 </form>
+<script>
+    function confirmAction(action) {
+        if (confirm("¿Estás seguro de que deseas " + action + " este proveedor?")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+</script>
 {% endblock %}

@@ -1,6 +1,15 @@
 {% extends 'layoutPrincipal.html' %}
 {% from "_macros.html" import input_Form %}
 {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 <form name="materia" action="" id="materia" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     <div class="container">
@@ -29,9 +38,18 @@
         </div>
         <div class="row">
             <div class="col-8 d-flex justify-content-center">   
-                <button class="btn btn-success" type="submit" name="btnMtrP" value="btnModificarMtrP" id="btnModificarMtrP">Modificar</button>
+                <button class="btn btn-success" type="submit" name="btnMtrP" value="btnModificarMtrP" id="btnModificarMtrP" onclick="return confirmAction('actualizar')">Modificar</button>
             </div>
         </div>
     </div>
 </form>
+<script>
+    function confirmAction(action) {
+        if (confirm("¿Estás seguro de que deseas " + action + " esta materia prima?")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+</script>
 {% endblock %}

@@ -5,6 +5,8 @@ from blueprints.models import MateriasPrimas, Proveedor, TipoMedidasMaterialPrim
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp
+from wtforms_components import DateRange
+from datetime import datetime, date
 
 
 class LoginForm(FlaskForm):
@@ -82,15 +84,13 @@ class gMateria(Form):
         medidas = TipoMedidasMaterialPrimas.query.all()
         self.tipoMedida.choices = [(medida.id_medida, medida.descripcion) for medida in medidas]    
 class CompraForm(Form):
-    #tabla compra
-    totalCompra = IntegerField("Total de la Compra", [validators.DataRequired(message="El campo es requerido"), validators.number_range(min=1, max=100000, message="Ingresa un valor valido")])
-    #tabla detalle compra
+    descripcion = StringField("Descripcion", [validators.DataRequired(message="El campo es requerido"), validators.Length(min=1, max=1000, message="Ingresa un valor valido")])
+    totalCompra = IntegerField("Precio", [validators.DataRequired(message="El campo es requerido"), validators.number_range(min=1, max=100000, message="Ingresa un valor valido")])
+    fechaCaducidad = DateField('Fecha caducidad', format='%Y-%m-%d', validators=[validators.DataRequired(message="El campo es requerido"), DateRange(min=datetime.today(), message="La fecha debe ser igual o posterior a hoy")])
     cantidad =IntegerField("Cantidad", [validators.DataRequired(message="El campo es requerido"),validators.number_range(min=1, max=100000, message="Ingresa un valor valido")])
     TipoMedida = StringField("Medida", [validators.DataRequired(message="El campo es requerido"), validators.Length(min=1, max=100, message="Ingresa nombre valido")])
     idMateriaPrima = SelectField('Materia Prima', coerce=int)
     idProveedor = SelectField('Proveedor', coerce=int)
-    descripcion = StringField("Descripcion", [validators.DataRequired(message="El campo es requerido"), validators.Length(min=1, max=1000, message="Ingresa un valor valido")])
-   
     def __init__(self, *args, **kwargs):
         super(CompraForm, self).__init__(*args, **kwargs)
         proveedores = Proveedor.query.filter_by(estatus=1).all()

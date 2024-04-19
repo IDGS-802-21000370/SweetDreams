@@ -1,6 +1,15 @@
 {% extends 'layoutPrincipal.html' %}
 {% from "_macros.html" import input_Form %}
 {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 <form name="materia" action="" id="materia" method="post">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 <div class="container">
@@ -32,8 +41,8 @@
                     <td>{{mtpm.nombre}}</td>
                     <td>{{mtpm.cantidad}}</td>
                     <td>{{mtpm.tipo_medida.descripcion}}</td>
-                    <td><button class="btn btn-danger" name="buttonMP" value="{{mtpm.id_materiaPrima}}" id="btnEliminarMP">Eliminar</button></td>
-                    <td><a href="/materiaUpdate?id={{mtpm.id_materiaPrima}}" class="btn btn-warning">Modificar</a></td>
+                    <td><button class="btn btn-danger" name="buttonMP" value="{{mtpm.id_materiaPrima}}" id="btnEliminarMP" onclick="return confirmAction('eliminar')">Eliminar</button></td>
+                    <td><a href="/materiaUpdate?id={{mtpm.id_materiaPrima}}" class="btn btn-warning" onclick="return confirmAction('modificar')">Modificar</a></td>
                 </tr>
                 {%endfor%}
             </tbody>
@@ -41,4 +50,13 @@
     </div>
 </div>
 </form>
+<script>
+    function confirmAction(action) {
+        if (confirm("¿Estás seguro de que deseas " + action + " esta materia prima?")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+</script>
 {% endblock %}
