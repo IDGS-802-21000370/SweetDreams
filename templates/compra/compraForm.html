@@ -10,6 +10,52 @@
         {% endfor %}
     {% endif %}
 {% endwith %}
+<style>/* Estilo para el fondo oscurecido detrás del modal */
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.5); /* Color y opacidad del fondo oscuro */
+    }
+    
+    /* Estilo para el contenido del modal */
+    .modal-content {
+        background-color: #ffffff; /* Color de fondo del modal */
+        border-radius: 10px; /* Bordes redondeados */
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1); /* Sombra */
+    }
+    
+    /* Estilo para el encabezado del modal */
+    .modal-header {
+        border-bottom: none; /* Quita el borde inferior */
+    }
+    
+    /* Estilo para el cuerpo del modal */
+    .modal-body {
+        padding: 20px; /* Espaciado interno */
+    }
+    
+    /* Estilo para el pie del modal */
+    .modal-footer {
+        border-top: none; /* Quita el borde superior */
+    }
+    
+    /* Estilo para el botón "Cancelar" del modal */
+    .modal-footer .btn-secondary {
+        background-color: #f0f0f0; /* Color de fondo */
+        color: #333; /* Color del texto */
+        border: none; /* Quita el borde */
+    }
+    
+    /* Estilo para el botón "Confirmar" del modal */
+    .modal-footer .btn-primary {
+        background-color: #007bff; /* Color de fondo */
+        color: #fff; /* Color del texto */
+        border: none; /* Quita el borde */
+    }
+    
+    /* Estilo para el título del modal */
+    .modal-title {
+        color: #333; /* Color del texto */
+    }
+    </style>
 <form name="proveedorForm" action="" id="proveedorForm" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     <div class="container">

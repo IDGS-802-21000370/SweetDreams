@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from flask import Blueprint, current_app, render_template, request, redirect, url_for
+from flask import Blueprint, current_app, flash, render_template, request, redirect, url_for
 from sqlalchemy import func
 import blueprints.forms as forms
 from blueprints.models import Galleta, MateriasPrimas, Merma
@@ -136,9 +136,10 @@ def inventario():
                 try:
                     with current_app.app_context():
                        
-                        cantidad_a_descontar = diccionario_productos.get(int(id_materiaPrima), 0)
+                        #cantidad_a_descontar = diccionario_productos.get(int(id_materiaPrima), 0)
+                        cantidad_a_descontar = 1
                         print("Cantidad a descontar:", cantidad_a_descontar)
-
+                         
                         productoss = MateriasPrimas.query.get(id_materiaPrima)
                        
                         if productoss:
@@ -148,22 +149,26 @@ def inventario():
                                 mermado=0
                             ).order_by(DetalleMateriaPrima.caducidad.asc()).first()
                             if detalle:
-                                productoss.cantidad -= cantidad_a_descontar
-                               
-                                detalle.cantidad -= cantidad_a_descontar
-                                if detalle.cantidad == 0:
-                                    detalle.mermado = 1
-                                merma = Merma(
-                                    nombre=f"Merma por descuento de materia prima: {productoss.nombre}",
-                                    cantidad=cantidad_a_descontar,
-                                    caducidad=detalle.caducidad,
-                                    tipomerma_id_tipoMerma=1,  
-                                    materiasprimas_id_materiaPrima=detalle.id_detalle_materiaprima
-                                )
-                               
-                                db.session.add(merma)
-                                db.session.commit()
-                                print("Producto y detalle de producto descontados correctamente.")
+                              if productoss.cantidad < 1:
+                                flash("no tienes suficientes materias primas ")
+                              else:
+                                    productoss.cantidad -= cantidad_a_descontar
+                                
+                                    detalle.cantidad -= cantidad_a_descontar
+                                    if detalle.cantidad == 0:
+                                        detalle.mermado = 1
+                                        
+                                    merma = Merma(
+                                        nombre=f"Merma por descuento de materia prima: {productoss.nombre}",
+                                        cantidad=cantidad_a_descontar,
+                                        caducidad=detalle.caducidad,
+                                        tipomerma_id_tipoMerma=1,  
+                                        materiasprimas_id_materiaPrima=detalle.id_detalle_materiaprima
+                                    )
+                                
+                                    db.session.add(merma)
+                                    db.session.commit()
+                                    flash("Producto y detalle de producto descontados correctamente.")
                         else:
                             print("No se encontró la materia prima correspondiente.")
                 except Exception as e:

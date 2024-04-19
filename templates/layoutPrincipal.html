@@ -102,6 +102,12 @@
                                 <i class="fas fa-chart-line"></i> Dashboard
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/materiaprima">
+                                <i class="fas fa-flask"></i> Materia Prima
+                            </a>
+                        </li>
+                        
                         {% endif %}
                         {% if current_user.is_authenticated and current_user.rol == 'usuario' %}
                         <li class="nav-item">
@@ -117,6 +123,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/inventario"><i class="fas fa-box-open"></i> Inventario <span class="sr-only">(algo)</span></a>
                         </li>
+                       
                         <li class="nav-item">
                             <a class="nav-link" href="/produccionGalleta"><i class="fas fa-cookie-bite"></i> Producción <span class="sr-only">(algo)</span></a>
                         </li>
@@ -130,6 +137,7 @@
                                 <i class="fas fa-chart-line"></i> Dashboard
                             </a>
                         </li>
+                        
                         {% endif %}
                 </ul>
                 <div class="ms-auto">

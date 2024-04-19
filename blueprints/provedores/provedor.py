@@ -15,6 +15,8 @@ def admin_required(func):
         return func(*args, **kwargs)
     return decorated_view
 DPrima = []
+MPrima = []
+MPrimaTexto = []
 MPrimaM = []
 MPrimaTextoM = []
 @proveedor_blueprint.route("/proveedores", methods=["GET", "POST"])
@@ -67,7 +69,7 @@ def prooveedorForm():
         prvdForm.materia.choices = [(mtr.id_materiaPrima, mtr.nombre) for mtr in materias_disponibles]
         
         if request.form['btnPrv'] == "btnRegistrarPrv":
-            if not MPrimaM:
+            if not MPrima:
                 flash('Ingrese materias primas al proveedor.', 'warning')
             else:
             #Alerta para registrar y checar que no haya datos repetidos en la tabla

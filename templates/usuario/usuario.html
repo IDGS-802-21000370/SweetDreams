@@ -48,21 +48,7 @@
                                     <h4 class="mt-1 mb-4 pb-1">Registro de usuario</h4>
                                 </div>
                                 <form method="POST" action="/usuario">
-                                    <div id="deleteModal" class="modal">
-                                        <div class="modal-content">
-                                            <span>¿Estás seguro de que quieres eliminar este usuario?</span>
-                                            <form method="POST" action="/usuario">
-                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                                <input type="hidden" id="userIdToDelete" name="eliminar" value="" />
-                                                <div class="d-flex justify-content-between">
-                                                    <button type="submit" class="btn btn-sm btn-danger">
-                                                        Eliminar
-                                                    </button>
-                                                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
+                                    
 
                                     <div class="form-outline mb-4">
                                         {{ input_Form(formUsuario.nombre, class="form-control", placeholder="Nombre") }}
@@ -126,6 +112,21 @@
                                             {% endfor %}
                                         </tbody>
                                     </table>
+                                    <div id="deleteModal" class="modal">
+                                        <div class="modal-content">
+                                            <span>¿Estás seguro de que quieres eliminar este usuario?</span>
+                                            <form method="POST" action="/usuario">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                                <input type="hidden" id="userIdToDelete" name="eliminar" value="" />
+                                                <div class="d-flex justify-content-between">
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        Eliminar
+                                                    </button>
+                                                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </form>
                             </div>
                         </div>

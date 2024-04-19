@@ -56,9 +56,11 @@ class DetalleProveedorMateria(db.Model):
         
     materia_prima = db.relationship('MateriasPrimas', backref='detalle_proveedor_materia')
     proveedor = db.relationship('Proveedor', backref='detalle_proveedor_materia')
+#nuevo
 class DetalleCompra(db.Model):
     id_detalleCompra = db.Column(db.Integer, primary_key=True)
     cantidad = db.Column(db.String(45))
+    precio = db.Column(db.Integer)
     tipomedidasmaterialprimas_id_medida = db.Column(db.Integer, db.ForeignKey('tipo_medidas_material_primas.id_medida'))
     compra_id_compra = db.Column(db.Integer, db.ForeignKey('compra.id_compra'))
     materiasprimas_id_materiaPrima = db.Column(db.Integer, db.ForeignKey('materias_primas.id_materiaPrima'))

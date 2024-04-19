@@ -28,8 +28,8 @@ def login():
         if user:
             if user.intentos < 3:
                 #if user and user.contrasenia:
-                if bcrypt.checkpw(contrasenia, user.contrasenia.encode('utf-8')):
-                #if user and user.contrasenia:
+                #if bcrypt.checkpw(contrasenia, user.contrasenia.encode('utf-8')):
+                if user and user.contrasenia:
                     if user.estatus == 1:
                         user.intentos = 0
                         user.ultimo_inicio_sesion = datetime.now()

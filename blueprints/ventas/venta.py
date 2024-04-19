@@ -1,10 +1,13 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 import blueprints.forms as forms
-from blueprints.models import Galleta, Usuario
+from blueprints.models import DetalleGalleta, Galleta, Usuario
 from functools import wraps
 from flask_login import current_user
 from flask import flash
 import datetime
+
+
+from datetime import datetime
 import os
 from flask import Blueprint, flash, render_template, request
 import blueprints.forms as forms
@@ -47,7 +50,11 @@ menu_items = []
 @login_required
 def ventas():
     galletas=Galleta.query.all()
+
     galletasc = Galleta.query.filter(Galleta.cantidad < 10).all()
+    if galletasc:
+        flash('¡Ups! Se están terminando las galletas. dirigete a la seccion de producción', 'warning')
+
     if request.method=="POST":
         if 'agregarPieza' in request.form or 'agregarPaq1' in request.form or 'agregarPaq2' in request.form:
             if 'agregarPieza' in request.form:
@@ -130,8 +137,25 @@ def ventas():
             for item in menu_items:
                 galletaRestada = Galleta.query.filter_by(id_galleta=item['id_galleta']).first()
                 cantidadRestante = galletaRestada.cantidad - item['cantidad']
-                galletaRestada.cantidad = cantidadRestante
+                # Verificar si la cantidad restante es mayor o igual a cero antes de actualizar
+                if cantidadRestante >= 0:
+                    galletaRestada.cantidad = cantidadRestante
+                else:
+                    # Si la cantidad restante es negativa, establecerla en cero para evitar números negativos
+                    galletaRestada.cantidad = 0
                 db.session.commit()
+
+                # Restar la cantidad vendida de los detalles de galleta correspondientes
+                detalles = DetalleGalleta.query.filter_by(galleta_id_galleta=item['id_galleta']).all()
+                for detalle in detalles:
+                    cantidadRestante_detalle = detalle.cantidad - item['cantidad']
+                    if cantidadRestante_detalle >= 0:
+                        detalle.cantidad = cantidadRestante_detalle
+                    else:
+                        detalle.cantidad = 0
+            db.session.commit()
+
+            db.session.commit()
             menu_items.clear()
             return render_template('ventas/ventas.html', galletas=galletas, totalVenta=totalVenta, modalVentaRealizada=True)
         if 'quitarPieza' in request.form or 'quitarPaq1' in request.form or 'quitarPaq2' in request.form:
@@ -234,7 +258,7 @@ def ventas():
                 caja.dineroTotal = retiro
                 caja.fecha_creacion = datetime.datetime.now()
                 db.session.commit()
-                return render_template('ventas/ventas.html', galletas=galletas, modalRetiroExitoso=True)
+                return render_template('ventas/ventas.html', galletas=galletas, modalRetiroExitoso=True,galletasc=galletasc)
     return render_template('ventas/ventas.html', galletas=galletas,galletasc=galletasc)
 """ =======
             
