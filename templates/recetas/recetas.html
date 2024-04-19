@@ -1,6 +1,22 @@
 {% extends 'layoutPrincipal.html' %}
 {% from "_macros.html" import input_Form %}
 {% block content %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('carmateriasPrimass').onchange = function() {
+            var selectedOption = this.options[this.selectedIndex];
+            var otraPropiedad = selectedOption.getAttribute('dataTM');
+            if (otraPropiedad == 1){
+                otraPropiedad = "Gramos"
+            } else if (otraPropiedad == 2){
+                otraPropiedad = "Piezas"
+            } else if (otraPropiedad == 3) {
+                otraPropiedad = "Mililitros"
+            }
+            document.getElementById('tipoMedida').value = otraPropiedad;
+        };
+    });    
+</script>
 <div class="container">
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -23,21 +39,11 @@
             </div>
             <div class="col-4">
                     <h4 class="titulos">Agregar nueva receta</h4>
-                <div class="col mt-2">
-                    <div class="row">
-                        <div class="col mt-2">
-                            {{input_Form(formReceta.nombreReceta, class="form-control")}} 
-                        </div>
-                        <div class="col">
-                            <label for="file" class="form-label">Imagen de la galleta</label>
-                            <input type="file" class="form-control" name="file">
-                        </div>
-                    </div>
-                    
+                <div class="col mt-2"> 
                         <label for="materiasPrimas" class="form-label">Selecciona la materia prima:</label>
                         <select id="carmateriasPrimass" name="materiasPrimas" class="form-select">
                             {% for mp in materiasPrimas %}
-                                <option value="{{ mp.id_materiaPrima }}">{{ mp.nombre }}</option>
+                                <option value="{{ mp.id_materiaPrima }}" dataTM="{{ mp.tipomedidasmaterialprimas_id_medida }}">{{ mp.nombre }}</option>
                             {% endfor %}
                         </select>
                         <div class="row">
@@ -45,19 +51,24 @@
                                 {{input_Form(formReceta.cantidad, class="form-control", type="number")}}
                             </div>
                             <div class="col">
-                                <label for="tipoMedidaMateriaPrima" class="form-label">Tipo de medida:</label>
-                                <select id="tipoMedidaMateriaPrima" name="tipoMedidaMateriaPrima" class="form-select">
-                                    {% for tmp in tipoMedidaMateriaPrima %}
-                                        <option value="{{ tmp.id_medida }}">{{ tmp.descripcion }}</option>
-                                    {% endfor %}
-                                </select>
+                                <label for="tipoMedida" class="form-label">Topo de medida:</label>
+                                <input type="text" id="tipoMedida" name="tipoMedida" class="form-control" readonly>
                             </div>
                         </div>
                         
                         
                         <div style="text-align: center;">
                             <input type="submit" id="registrar" class="btn btn-dark mt-3" name="registrar" value="Registrar ingrediente"/>
-                        </div>    
+                        </div>   
+                        <div class="row">
+                            <div class="col mt-2">
+                                {{input_Form(formReceta.nombreReceta, class="form-control")}} 
+                            </div>
+                            <div class="col">
+                                <label for="file" class="form-label">Imagen de la galleta</label>
+                                <input type="file" class="form-control" name="file">
+                            </div>
+                        </div> 
                         <div class="row">
                             <div class="col mt-2">
                                 {{input_Form(formReceta.tiempoHornear, class="form-control", type="number")}} 
@@ -183,6 +194,19 @@
                 <span class="close" onclick="cerrarModal()" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
                 <h3 style="color: red;">NOTIFICACIÓN</h3>
                 <p>No se puede agregar el mismo ingrediente</p>
+            </div>
+        </div>
+    </div>
+    
+    {% endif %}
+
+    {% if modal_tipoMvacio %}
+    <div>
+        <div id="modal" class="modal" style="{% if modal_tipoMvacio %}display: block;{% else %}display: none;{% endif %}">
+            <div class="modal-content">
+                <span class="close" onclick="cerrarModal()" style="position: absolute; top: 5px; right: 10px; cursor: pointer;">Cerrar</span>
+                <h3 style="color: red;">NOTIFICACIÓN</h3>
+                <p>Debe de haber un tipo de medida</p>
             </div>
         </div>
     </div>

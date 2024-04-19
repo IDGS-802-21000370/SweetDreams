@@ -2,15 +2,6 @@
 {% from "_macros.html" import input_Form %}
 {% block content %}
 <div class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-        {% endif %}
-    {% endwith %}
     <style>
         .modal {
             display: none; 
@@ -101,7 +92,7 @@
             <div class="line"></div>
             <div class="line"></div>
         </div>
-        
+
         <div id="menu" class="menu">
             <ul>
                 <li></li>
@@ -121,28 +112,40 @@
                 {% for galleta in galletas %}
                 <div class="col">
                     <div class="card mt-5" style="width: 15rem;">
-                        <img src="static/img/{{ galleta.imagen }}" style="width: 180px; height: 180px; margin: 0 auto;" class="card-img-top" alt="Galleta {{ galleta.id_galleta + 1 }}">
+                        <img src="static/img/{{galleta.imagen}}" style="width: 180px; height: 180px; margin: 0 auto;" class="card-img-top" alt="Galleta {{ galleta.id_galleta+1 }}">
                         <h5 style="margin: auto;">{{galleta.nombre}}</h5>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Pieza ${{galleta.precioPieza}}
                                 <div class="ml-auto">
-                                    <input type="submit" id="agregarPieza" class="btn btn-success rounded-circle" name="agregarPieza" value="{{ galleta.id_galleta }}"/>
-                                    <input type="submit" id="quitarPieza" class="btn btn-danger rounded-circle" name="quitarPieza" value="{{ galleta.id_galleta }}"/>
+                                    <button type="submit" id="agregarPieza" class="btn btn-success rounded-circle" name="agregarPieza" value="{{ galleta.id_galleta }}">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                    <button type="submit" id="quitarPieza" class="btn btn-danger rounded-circle" name="quitarPieza" value="{{ galleta.id_galleta }}">
+                                        <i class="bi bi-dash"></i>
+                                    </button>
                                 </div>
                             </li>                   
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 700 Gm ${{galleta.precioPaquete1}}
                                 <div class="ml-auto">
-                                    <input type="submit" id="agregarPaq1" class="btn btn-success rounded-circle" name="agregarPaq1" value="{{ galleta.id_galleta }}"/>
-                                    <input type="submit" id="quitarPaq1" class="btn btn-danger rounded-circle" name="quitarPaq1" value="{{ galleta.id_galleta }}"/>
+                                    <button type="submit" id="agregarPaq1" class="btn btn-success rounded-circle" name="agregarPaq1" value="{{ galleta.id_galleta }}">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                    <button type="submit" id="quitarPaq1" class="btn btn-danger rounded-circle" name="quitarPaq1" value="{{ galleta.id_galleta }}">
+                                        <i class="bi bi-dash"></i>
+                                    </button>
                                 </div>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 1 kg ${{galleta.precioPaquete2}}
                                 <div class="ml-auto">
-                                    <input type="submit" id="agregarPaq2" class="btn btn-success rounded-circle" name="agregarPaq2" value="{{ galleta.id_galleta }}"/>
-                                    <input type="submit" id="quitarPaq2" class="btn btn-danger rounded-circle" name="quitarPaq2" value="{{ galleta.id_galleta }}"/>
+                                    <button type="submit" id="agregarPaq2" class="btn btn-success rounded-circle" name="agregarPaq2" value="{{ galleta.id_galleta }}">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                    <button type="submit" id="quitarPaq2" class="btn btn-danger rounded-circle" name="quitarPaq2" value="{{ galleta.id_galleta }}">
+                                        <i class="bi bi-dash"></i>
+                                    </button>
                                 </div>
                             </li>
                             <input type="hidden" name="csrf_token" value="{{csrf_token()}}"/>

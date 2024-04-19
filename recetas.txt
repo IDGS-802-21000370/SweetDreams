@@ -1,0 +1,1 @@
+id_catReceta: 1, ingrediente: Harina, cantidad: 1, tipoMedida: Gramos

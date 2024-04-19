@@ -36,9 +36,11 @@ def recetas():
     if request.method=="POST":
         ingrediente = request.form['materiasPrimas']
         cantidad = request.form['cantidad']
-        tipoMedida = request.form['tipoMedidaMateriaPrima']
+        tipoMedida = request.form['tipoMedida']
         
         if 'registrar' in request.form:
+            if tipoMedida == '':
+                return render_template("recetas/recetas.html", formReceta = formReceta, materiasPrimas=materiasPrimas, tipoMedidaMateriaPrima=tipoMedidaMateriaPrima, modal_tipoMvacio=True)
             if cantidad == '':
                 return render_template("recetas/recetas.html", formReceta = formReceta, materiasPrimas=materiasPrimas, tipoMedidaMateriaPrima=tipoMedidaMateriaPrima, modal_cantidad=True)
             else:    
@@ -60,7 +62,7 @@ def recetas():
                     else:
                         print(f"Prosigue la receta")
                 ingrediente = materiaPrima[0].nombre
-                tipoMedida = tipo_medida_map.get(tipoMedida, '')
+                #tipoMedida = tipo_medida_map.get(tipoMedida, '')
                 global contador_recetas
                 contador_recetas += 1
                 with open("recetas.txt", "a", encoding="utf-8") as file:
@@ -180,7 +182,8 @@ def recetas():
                                                     tipomedidasmaterialprimas_id_medida=id_tipoMedida)
                         db.session.add(detalleReceta)
                         db.session.commit()
-                    os.remove("recetas.txt")
+                    with open("recetas.txt", "w",  encoding="utf-8") as file:
+                        recetas = file.write('')
                     return render_template("recetas/recetas.html", formReceta=formReceta, materiasPrimas=materiasPrimas, tipoMedidaMateriaPrima=tipoMedidaMateriaPrima, mostrar_modal=False)
         elif 'cargar' in request.form:
                 recetasCargadas=Receta.query.all()
@@ -247,6 +250,7 @@ def recetas():
                                                 tipomedidasmaterialprimas_id_medida=id_tipoMedida)
                     db.session.add(detalleReceta)
                     db.session.commit()
-                os.remove("recetas.txt")
+                with open("recetas.txt", "w",  encoding="utf-8") as file:
+                    recetas = file.write('')
                 return render_template("recetas/recetas.html", formReceta=formReceta, materiasPrimas=materiasPrimas, tipoMedidaMateriaPrima=tipoMedidaMateriaPrima, cargarMateriasPrimas=cargarMateriasPrimas)
     return render_template("recetas/recetas.html", formReceta=formReceta, materiasPrimas=materiasPrimas, tipoMedidaMateriaPrima=tipoMedidaMateriaPrima,  mostrar_modal=False)

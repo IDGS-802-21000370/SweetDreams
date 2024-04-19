@@ -158,11 +158,14 @@ def ventas():
                 encontrado = False
             for item in menu_items:
                 if item['id_galleta'] == id_galleta and item['tipoVenta'] == id_tipoVenta:
-                    item['precio'] -= precio
-                    item['cantidad'] -= 1
-                    cantidad = item['cantidad']
-                    encontrado = True
-                    break
+                    if item['precio'] <= 0:
+                        item['precio'] = 0.0
+                    else:
+                        item['precio'] -= precio
+                        item['cantidad'] -= 1
+                        cantidad = item['cantidad']
+                        encontrado = True
+                        break
             totalVenta = sum(item["precio"] for item in menu_items)
             return render_template('ventas/ventas.html', galletas=galletas, menu_items=menu_items, totalVenta=totalVenta)
         if 'venderImprimir' in request.form:
