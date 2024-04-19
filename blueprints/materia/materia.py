@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, redirect, render_template, request, url_for, flash
 from blueprints.models import MateriasPrimas, DetalleProveedorMateria, db
 from datetime import datetime
 import blueprints.forms as forms
@@ -22,6 +22,7 @@ def materiaprimaIndex():
             for detalle in detalle:
                 detalle.estatus = 0
                 db.session.commit()
+            flash('Materia prima eliminada.', 'warning')
             return redirect(url_for('materias.materiaprimaIndex'))
         
     return render_template("materia/materia.html", Materias=materias)
@@ -34,10 +35,16 @@ def materiaprimaForm():
         if request.form['btnMtrP'] == "btnRegistrarMtrP":
             #Alerta para registrar
             formMtr=forms.MateriaForm(request.form)
-            mtr=MateriasPrimas(nombre=formMtr.nombre.data, cantidad=0, caducidad=datetime.now(), tipomedidasmaterialprimas_id_medida = formMtr.tipoMedida.data)
-            db.session.add(mtr)
-            db.session.commit()
-            return redirect(url_for('materias.materiaprimaIndex'))
+            nombre=formMtr.nombre.data
+            materiaExistente = MateriasPrimas.query.filter_by(nombre=nombre).first()
+            if materiaExistente:
+                flash('El nombre de la materia prima ya existe. Por favor, elija otro nombre.', 'warning')
+            else:
+                mtr=MateriasPrimas(nombre=formMtr.nombre.data, cantidad=0, tipomedidasmaterialprimas_id_medida = formMtr.tipoMedida.data)
+                db.session.add(mtr)
+                db.session.commit()
+                flash('Materia prima registrada.', 'warning')
+                return redirect(url_for('materias.materiaprimaIndex'))
         
     return render_template("materia/materiaForm.html", formMateria=mtrForm)
 
@@ -59,8 +66,8 @@ def materiaprimaUpdate():
         mtr.tipomedidasmaterialprimas_id_medida=mtrForm.tipoMedida.data
         db.session.add(mtr)
         db.session.commit()
+        flash('Materia prima actualizada.', 'warning') 
         return redirect(url_for('materias.materiaprimaIndex'))
-        
     return render_template("materia/materiaUpdate.html", formMateria=mtrForm)
 
 @materiaprima_blueprint.route("/materiaEliminada", methods=["GET", "POST"])
@@ -79,6 +86,7 @@ def materiaEliminado():
             for detalle in detalle:
                 detalle.estatus = 1
                 db.session.commit()
+            flash('Materia prima restaurada.', 'warning')
             return redirect(url_for('materias.materiaEliminado'))
         
     return render_template("materia/materiaEliminada.html", MateriasE=mtrE)

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, url_for, redirect
+from flask import Blueprint, render_template, request, url_for, redirect, flash
 import blueprints.forms as forms
 from blueprints.models import Compra, DetalleCompra, Caja, CajaRetiro, DetalleMateriaPrima, MateriasPrimas, TipoMedidasMaterialPrimas, DetalleProveedorMateria, Proveedor, db
 from datetime import datetime
@@ -10,7 +10,8 @@ def admin_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
         if not current_user.is_authenticated:
-            return render_template('404/404.html')
+            # Redirigir a una página de acceso denegado o a la página principal
+            return redirect(url_for('login.login'))
         return func(*args, **kwargs)
     return decorated_view
 
@@ -19,7 +20,7 @@ def obtener_mp_por_proveedor():
     proveedores = Proveedor.query.filter_by(estatus=1).all()
     for proveedor in proveedores:
         mp_por_proveedor[proveedor.id_proveedor] = []
-        materias_primas = DetalleProveedorMateria.query.filter_by(proveedor_id_proveedor=proveedor.id_proveedor).all()
+        materias_primas = DetalleProveedorMateria.query.filter_by(proveedor_id_proveedor=proveedor.id_proveedor, estatus=1).all()
         for mp in materias_primas:
             mp_por_proveedor[proveedor.id_proveedor].append({
                 'id': mp.materia_prima.id_materiaPrima,
@@ -52,6 +53,7 @@ def compraForm():
     crpForm=forms.CompraForm(request.form)
     global MPrima
     global MPrimaTexto
+    tCompra=0
     mapr = MateriasPrimas.query.filter_by(estatus=1).all()
     mpinfo = {materia.id_materiaPrima: materia.tipo_medida.descripcion for materia in mapr}
 
@@ -59,6 +61,7 @@ def compraForm():
     tminfo = {tipo.descripcion: tipo.id_medida for tipo in tm}
     pdm = obtener_mp_por_proveedor()
     if request.method=="POST":
+
         if request.form['buttonMP'] == "btnAgregarMP":
             cantidad=crpForm.cantidad.data
             tipoMP_id = tminfo.get(crpForm.TipoMedida.data, '')
@@ -67,58 +70,65 @@ def compraForm():
             materiaprima_valor = dict(crpForm.idMateriaPrima.choices).get(materiaprima_id)
             prvd_id = crpForm.idProveedor.data
             prvd_valor = dict(crpForm.idProveedor.choices).get(prvd_id)
-            print(tipoMP_valor)
+            totalCompra = crpForm.totalCompra.data
+            fechaCaducidad = crpForm.fechaCaducidad.data
             MPrima.append({ 
                            'cantidad': cantidad, 
                            'tipoMP':tipoMP_id, 
                            'materiaprima': materiaprima_id, 
-                           'prvd':prvd_id
+                           'prvd':prvd_id,
+                           'total':totalCompra,
+                           'fechaCaducidad':fechaCaducidad
                            }
             )
             MPrimaTexto.append({ 
                            'cantidad': cantidad, 
                            'tipoMP':tipoMP_valor, 
                            'materiaprima': materiaprima_valor, 
-                           'prvd':prvd_valor
+                           'prvd':prvd_valor,
+                           'total':totalCompra,
+                           'fechaCaducidad':fechaCaducidad
                            }
             )
-            crpForm.cantidad.data=None
+            tCompra = sum(item['total'] for item in MPrima)
 
         if request.form['buttonMP'] == "btnQuitarMP":
             indexEliminar = request.form.getlist('eliminar[]')
             indexEliminar = [int(index) for index in indexEliminar]
             MPrima = [materiap for i, materiap in enumerate(MPrima, 1) if i not in indexEliminar]
             MPrimaTexto = [materiav for i, materiav in enumerate(MPrimaTexto, 1) if i not in indexEliminar]
+            tCompra = sum(item['total'] for item in MPrima)
 
         if request.form['buttonMP'] == "btnLimpiarMP":
             MPrima.clear()
             MPrimaTexto.clear()
+            tCompra = sum(item['total'] for item in MPrima)
 
         #Alerta para Registrar        
         if request.form['buttonMP'] == "btnRegistrarMP":
-
+            tCompra = sum(item['total'] for item in MPrima)
             if not MPrima:
-                print("Ingrese materias primas a registrar")
-            #Alert
+                flash('Ingrese materias primas.', 'warning')
             else:
                 cajaA=db.session.query(Caja).filter(Caja.id_caja==1).first()
-                if cajaA.dineroTotal < int(crpForm.totalCompra.data):
-                    print("No hay suficiente dinero en caja")
-                else:                    
+                if cajaA.dineroTotal < (sum(item['total'] for item in MPrima)):
+                    flash('No hay suficiente dinero en caja.', 'warning')
+                else:
                     #tabla compra
                     uid = current_user.id_usuario
-                    prvd=Compra(totalCompra=crpForm.totalCompra.data, fecha_actualiza = datetime.now(), usuario_id_usuario = uid)
+                    prvd=Compra(totalCompra=(sum(item['total'] for item in MPrima)), fecha_actualiza = datetime.now(), usuario_id_usuario = uid)
+                    
                     db.session.add(prvd)
                     db.session.commit()
                     idCompra = db.session.query(db.func.max(Compra.id_compra)).scalar()
 
                     #tabla caja_retiro
-                    detalle = CajaRetiro(descripcion=crpForm.descripcion.data, dineroSacado=crpForm.totalCompra.data, caja_id_caja=1, compra_id_compra=idCompra)
+                    detalle = CajaRetiro(descripcion=crpForm.descripcion.data, dineroSacado=(sum(item['total'] for item in MPrima)), caja_id_caja=1, compra_id_compra=idCompra)
                     db.session.add(detalle)
                     db.session.commit()
 
                     #restar de caja
-                    cajaA.dineroTotal = (cajaA.dineroTotal - int(crpForm.totalCompra.data))
+                    cajaA.dineroTotal = (cajaA.dineroTotal - (sum(item['total'] for item in MPrima)))
                     #print(cajaA.dineroTotal - int(crpForm.totalCompra.data))
                     db.session.add(cajaA)
                     db.session.commit()
@@ -129,6 +139,8 @@ def compraForm():
                         tipoMP_id = elemento['tipoMP']
                         materiaprima_id = elemento['materiaprima']
                         prvd_id = elemento['prvd']
+                        fechaCaducidad = elemento['fechaCaducidad']
+                        precio = elemento['totalCompra']
                 
                         detalle = DetalleCompra(cantidad=cantidad, tipomedidasmaterialprimas_id_medida=tipoMP_id, 
                                                 compra_id_compra=idCompra, materiasprimas_id_materiaPrima=materiaprima_id, 
@@ -137,7 +149,7 @@ def compraForm():
                         db.session.commit()
 
                         #registro detalle materia prima
-                        detalleMP = DetalleMateriaPrima(cantidad=cantidad, caducidad=datetime.now(), 
+                        detalleMP = DetalleMateriaPrima(cantidad=cantidad, caducidad=fechaCaducidad, precio=precio,
                                                 mermado=0, materia_prima_id=materiaprima_id, 
                                                 tipo_medida_id=tipoMP_id)
                         db.session.add(detalleMP)
@@ -151,7 +163,12 @@ def compraForm():
                         
                     MPrima.clear()
                     MPrimaTexto.clear()
+                    flash('Compra registrada.', 'warning')
                     return redirect(url_for('compras.compraIndex'))
 
-
-    return render_template("compra/compraForm.html", formCompra=crpForm, MPrima=MPrimaTexto, mpinfo=mpinfo, pdm=pdm)
+        if request.form['buttonMP'] == "btnRegresarMP":
+            MPrima.clear()
+            MPrimaTexto.clear()
+            return redirect(url_for('compras.compraIndex'))
+            
+    return render_template("compra/compraForm.html", crpForm=crpForm, MPrima=MPrimaTexto, mpinfo=mpinfo, pdm=pdm, tCompra=tCompra)
