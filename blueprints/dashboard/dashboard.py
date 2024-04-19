@@ -13,7 +13,6 @@ def admin_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
         if not current_user.is_authenticated:
-            # Redirigir a una página de acceso denegado o a la página principal
             return render_template('404/404.html')
         return func(*args, **kwargs)
     return decorated_view

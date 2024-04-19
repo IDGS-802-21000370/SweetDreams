@@ -10,7 +10,7 @@ from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp
 class LoginForm(FlaskForm):
     usuario = StringField("Nombre de usuario", [validators.DataRequired(message="el campo es requerido"), 
                          validators.Length(min=1, max=30, message="ingresa nombre valido")])
-    contrasenia = StringField("Contraseña", [validators.DataRequired(message="el campo es requerido"), 
+    contrasenia = PasswordField("Contraseña", [validators.DataRequired(message="el campo es requerido"), 
                          validators.Length(min=1, max=30, message="ingresa nombre valido")])
     
 

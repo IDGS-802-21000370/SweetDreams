@@ -1,9 +1,7 @@
-from flask import Blueprint, render_template, request, url_for, redirect
+from flask import Blueprint, render_template, request, url_for, redirect, flash
 import blueprints.forms as forms
 from blueprints.models import Compra, DetalleCompra, Caja, CajaRetiro, DetalleMateriaPrima, MateriasPrimas, TipoMedidasMaterialPrimas, DetalleProveedorMateria, Proveedor, db
 from datetime import datetime
-from functools import wraps
-from flask_login import current_user
 from functools import wraps
 from flask_login import current_user
 
@@ -15,23 +13,28 @@ def login_required(func):
             return redirect(url_for('login.login'))
         return func(*args, **kwargs)
     return decorated_view
+
 MPrima = []
 MPrimaTexto = []
-@compra_blueprint.route("/compras", methods=["GET", "POST"])
-@login_required
 def obtener_mp_por_proveedor():
     mp_por_proveedor = {}
     proveedores = Proveedor.query.filter_by(estatus=1).all()
     for proveedor in proveedores:
         mp_por_proveedor[proveedor.id_proveedor] = []
-        materias_primas = DetalleProveedorMateria.query.filter_by(proveedor_id_proveedor=proveedor.id_proveedor).all()
+        materias_primas = DetalleProveedorMateria.query.filter_by(proveedor_id_proveedor=proveedor.id_proveedor, estatus=1).all()
         for mp in materias_primas:
             mp_por_proveedor[proveedor.id_proveedor].append({
                 'id': mp.materia_prima.id_materiaPrima,
                 'nombre': mp.materia_prima.nombre
             })
-
     return mp_por_proveedor
+
+@compra_blueprint.route("/compras", methods=["GET", "POST"])
+@login_required
+def compraIndex():
+    compras = Compra.query.all()
+        
+    return render_template("compra/compra.html", Compra=compras)
 
 @compra_blueprint.route("/detalleCompra", methods=["GET", "POST"])
 @login_required
